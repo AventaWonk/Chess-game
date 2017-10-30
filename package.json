@@ -1,0 +1,32 @@
+{
+  "name": "validator",
+  "version": "1.0.0",
+  "description": "ChessGame",
+  "main": "index.js",
+  "dependencies": {
+    "@types/jasmine": "^2.6.0",
+    "jasmine": "^2.7.0"
+  },
+  "scripts": {
+    "test": "jasmine-ts",
+    "build": "webpack -p"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AventaWonk/JSChessEngine.git"
+  },
+  "author": "Roman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AventaWonk/JSChessEngine/issues"
+  },
+  "homepage": "https://github.com/AventaWonk/JSChessEngine#readme",
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.2.3",
+    "jasmine": "^2.8.0",
+    "jasmine-ts": "^0.2.1",
+    "source-map-loader": "^0.2.2",
+    "typescript": "^2.5.2",
+    "webpack": "^3.5.5"
+  }
+}
