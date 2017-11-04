@@ -1,3 +1,8 @@
+interface Coordinate {
+  i: number;
+  j: number;
+}
+
 export default abstract class Piece {
   protected whiteImageLink: string;
   protected blackImageLink: string;
@@ -6,6 +11,8 @@ export default abstract class Piece {
   constructor(side: number) {
     this.side = side;
   }
+
+  public abstract getMoves(coordinate: Coordinate, chessBoard: any): Coordinate[];
 
   public getImage(imageSize: string): HTMLImageElement {
     let img = document.createElement("img");
