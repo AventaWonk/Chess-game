@@ -13,54 +13,95 @@ interface virtualBoardPoint {
 }
 
 interface virtualMove {
-  piece: Piece;
+  // pieceLink: Piece;
   oldCoordinate: Coordinate;
-  newCoordinates: Coordinate[];
+  newCoordinate: Coordinate;
+}
+
+interface virtualPiece {
+  piece: Piece;
+  coordinate: Coordinate;
 }
 
 export default class ChessEngine {
   private player: number;
-  private chessBoard: Piece[][] = Array(8);
+  private virtualChessBoard: virtualPiece[][] = Array(8);
+  private pieces: virtualPiece[] = [];
   private callback: Function;
 
   constructor(player: any, picesSetup: virtualBoardPoint[], callback: Function) {
     this.player = player;
-    this.chessBoard = [[],[],[],[],[],[],[],[]];
+    this.pieces = this.pieces.concat(picesSetup);
+    this.virtualChessBoard = [[],[],[],[],[],[],[],[]];
     this.callback = callback;
 
-    for (let i = 0; i < picesSetup.length; i++) {
-      let currentPiceSetup = picesSetup[i];
-      this.chessBoard[currentPiceSetup.coordinate.i][currentPiceSetup.coordinate.j] = currentPiceSetup.piece;
+    for (let i = 0; i < this.pieces.length; i++) {
+      let currentPiceSetup = this.pieces[i];
+      this.virtualChessBoard[currentPiceSetup.coordinate.i][currentPiceSetup.coordinate.j] = currentPiceSetup;
     }
   }
 
-  public analize() {
-    let moves: virtualMove[] = [];
+  private getAvalibleMoves() {
+    let avalibleMoves: virtualMove[] = [];
 
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (this.chessBoard[i][j] && this.chessBoard[i][j].getSide() != this.player) {
-          moves.push({
-            piece: this.chessBoard[i][j],
-            oldCoordinate: {i: i,j: j},
-            newCoordinates: this.chessBoard[i][j].getMoves({i: i,j: j}, this.chessBoard)
+    for (let i = 0; i < this.pieces.length; i++) {
+      if (this.pieces[i].piece.getSide() != this.player) {
+        let currentPiece = this.pieces[i];
+        let avaliblePiecesMoves = currentPiece.piece.getMoves(currentPiece.coordinate, this.virtualChessBoard);
+
+        for (let i = 0; i < avaliblePiecesMoves.length; i++) {
+          let targetSquare = this.virtualChessBoard[avaliblePiecesMoves[i].i][avaliblePiecesMoves[i].j];
+
+          if (targetSquare && (targetSquare.coordinate.i > 7 || targetSquare.coordinate.j > 7 || targetSquare.coordinate.j < 0 || targetSquare.coordinate.j < 0)) {
+            break;
+          }
+
+          if (targetSquare && targetSquare.piece.getSide() != this.player) {
+            break;
+          }
+
+          avalibleMoves.push({
+            oldCoordinate: currentPiece.coordinate,
+            newCoordinate: avaliblePiecesMoves[i],
           });
         }
       }
     }
 
-    return moves;
+    return avalibleMoves;
   }
 
-  public move(coordinate1: Coordinate, coordinate2: Coordinate): any {
-    let movedPiece = this.chessBoard[coordinate1.i][coordinate1.j];
-    let targePiece = this.chessBoard[coordinate2.i][coordinate2.j];
+  private movePiece(oldCoordinate: Coordinate, newCoordinate: Coordinate) {
+    if (this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
+      for (let i = 0; i < this.pieces.length; i++) {
+          if (this.pieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
+            this.pieces.splice(i, 1);
+            break;
+          };
+      }
+    }
 
-    this.chessBoard[coordinate2.i][coordinate2.j] = this.chessBoard[coordinate1.i][coordinate1.j];
-    this.chessBoard[coordinate1.i][coordinate1.j] = null;
+    this.virtualChessBoard[newCoordinate.i][newCoordinate.j] = this.virtualChessBoard[oldCoordinate.i][oldCoordinate.j];
+    this.virtualChessBoard[newCoordinate.i][newCoordinate.j].coordinate = newCoordinate;
+    this.virtualChessBoard[oldCoordinate.i][oldCoordinate.j] = null;
+  }
+  
+  private analize(): virtualMove {
+    let avalibleMoves: virtualMove[] = this.getAvalibleMoves();
+    let selectedMove: virtualMove;
 
-    let avalibleMoves = this.analize();
-    this.callback(avalibleMoves[0].oldCoordinate, avalibleMoves[0].newCoordinates[0])
+    // for (let i = 0; i < array.length; i++) {
+    //     array[i];
+    // }
+
+    selectedMove = avalibleMoves[0];
+    this.movePiece(selectedMove.oldCoordinate, selectedMove.newCoordinate);
+
+    return selectedMove;
+  }
+
+  private getPiece() {
+
   }
 
   public position() {
@@ -73,5 +114,12 @@ export default class ChessEngine {
 
   public stop() {
 
+  }
+
+  public move(oldCoordinate: Coordinate, newCoordinate: Coordinate): any {
+    this.movePiece(oldCoordinate, newCoordinate);
+
+    let selectedMove = this.analize();
+    this.callback(selectedMove.oldCoordinate, selectedMove.newCoordinate)
   }
 }
