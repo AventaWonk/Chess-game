@@ -30,4 +30,8 @@ export default abstract class Piece {
   public getSide() {
     return this.side;
   }
+
+  protected isOutOfBoard(i: number, j: number): boolean {
+    return (i > 7 || j > 7) || (i < 0 || j < 0);
+  }
 }

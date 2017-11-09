@@ -1,5 +1,7 @@
+import ChessEngine from './ChessEngine';
 import Piece from './Piece/Piece';
 import Pawn from './Piece/Pawn';
+import {defaultPiecesSetup, defaultPiecesSetup2} from './PiecesSetup';
 
 interface Coordinate {
   i: number;
@@ -17,52 +19,32 @@ interface BoardPoint {
 }
 
 export default class ChessGame {
-  // public static PLAYER_WHTIE = 1;
-  // public static PLAYER_BLACK = 2;
+  public static WHTIE = 1;
+  public static BLACK = 2;
   private static SQUARE_SIZE = "60";
   private static IMAGE_SIZE = "40";
   private static WHITE_SQUARE_COLOR = "#ffccb3";
   private static BLACK_SQUARE_COLOR = "#af6744";
+  private player: number;
   private selectedPiece: virtualBoardPoint = null;
   private chessBoard: BoardPoint[][] = Array(8);
   private chessBoardElement: HTMLElement;
+  private engine: ChessEngine;
 
-  constructor() {
+  constructor(player: number) {
+    this.player = player;
     this.chessBoard = [[],[],[],[],[],[],[],[]];
     this.onBoardClickCallback = this.onBoardClickCallback.bind(this);
+    this.onMoveAnalizedCallback = this.onMoveAnalizedCallback.bind(this);
     this.chessBoardElement = this.createChessBoardElement();
-    let piecesSetup = [
-      {
-        piece: new Pawn(),
-        coordinate: {
-          i: 1,
-          j: 0,
-        },
-      },
-      {
-        piece: new Pawn(),
-        coordinate: {
-          i: 1,
-          j: 1,
-        },
-      },
-      {
-        piece: new Pawn(),
-        coordinate: {
-          i: 1,
-          j: 2,
-        },
-      },
-      {
-        piece: new Pawn(),
-        coordinate: {
-          i: 1,
-          j: 3,
-        },
-      }
-    ]
-    this.setUpPiecesOnBoard(piecesSetup);
 
+    if (this.player == ChessGame.WHTIE) {
+      this.setUpPiecesOnBoard(defaultPiecesSetup);
+    } else {
+      this.setUpPiecesOnBoard(defaultPiecesSetup2);
+    }
+
+    this.engine = new ChessEngine(player, defaultPiecesSetup2, this.onMoveAnalizedCallback);
   }
 
   private onBoardClickCallback(e: Event) {
@@ -87,9 +69,15 @@ export default class ChessGame {
 
     if (this.selectedPiece) {
       let selected = this.chessBoard[this.selectedPiece.coordinate.i][this.selectedPiece.coordinate.j];
+
+      if (current.piece && selected.piece.getSide() == current.piece.getSide()) { // @TODO castling
+        return;
+      }
+
       this.removePiecefromPoint(this.selectedPiece.coordinate);
       this.setPieceOnPoint(coordinate, this.selectedPiece.piece);
       selected.squareLink.style.background = "#ffccb3";
+      this.engine.move(this.selectedPiece.coordinate, coordinate);
       this.selectedPiece = null;
     } else {
       if (current.piece) {
@@ -100,7 +88,18 @@ export default class ChessGame {
         current.squareLink.style.background = "#ffcaa1";
       }
     }
+  }
 
+  private onMoveAnalizedCallback(coordinate: Coordinate, newCoordinate: Coordinate) {
+    let movedPiece = this.chessBoard[coordinate.i][coordinate.j].piece;
+
+    if (this.chessBoard[newCoordinate.i][newCoordinate.j].piece) {
+      this.removePiecefromPoint(newCoordinate);
+    }
+
+    this.setPieceOnPoint(newCoordinate, movedPiece);
+    this.removePiecefromPoint(coordinate);
+    // this.move();
   }
 
   private onKeyClickCallback(e: Event) {
@@ -172,7 +171,7 @@ export default class ChessGame {
             let square = document.createElement("td");
             square.dataset.i = i.toString();
             square.dataset.j = j.toString();
-            let color = this.getSquareColor(i, j);
+            let color= this.getSquareColor(i, j);;
 
             square.style.height = ChessGame.SQUARE_SIZE + "px";
             square.style.width = ChessGame.SQUARE_SIZE + "px";
