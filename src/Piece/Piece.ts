@@ -6,6 +6,7 @@ interface Coordinate {
 export default abstract class Piece {
   protected whiteImageLink: string;
   protected blackImageLink: string;
+  protected weight: number = 0;
   protected side: number;
 
   constructor(side: number) {
@@ -29,6 +30,10 @@ export default abstract class Piece {
 
   public getSide() {
     return this.side;
+  }
+
+  public getWeight() {
+    return this.weight;
   }
 
   protected isOutOfBoard(i: number, j: number): boolean {

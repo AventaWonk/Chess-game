@@ -28,6 +28,10 @@ export default class ChessEngine {
   private virtualChessBoard: virtualPiece[][] = Array(8);
   private pieces: virtualPiece[] = [];
   private callback: Function;
+  private enginePiecesCount: number = 0;
+  private opponentPiecesCount: number = 0;
+  private enginePiecesWight: number = 0;
+  private opponentPiecesWight: number = 0;
 
   constructor(player: any, picesSetup: virtualBoardPoint[], callback: Function) {
     this.player = player;
@@ -38,6 +42,14 @@ export default class ChessEngine {
     for (let i = 0; i < this.pieces.length; i++) {
       let currentPiceSetup = this.pieces[i];
       this.virtualChessBoard[currentPiceSetup.coordinate.i][currentPiceSetup.coordinate.j] = currentPiceSetup;
+
+      if (currentPiceSetup.piece.getSide == player) {
+        this.opponentPiecesCount += 1;
+        this.opponentPiecesWight += currentPiceSetup.piece.getWeight();
+        continue;
+      }
+      this.enginePiecesCount += 1;
+      this.enginePiecesWight += currentPiceSetup.piece.getWeight();
     }
   }
 
@@ -74,10 +86,10 @@ export default class ChessEngine {
   private movePiece(oldCoordinate: Coordinate, newCoordinate: Coordinate) {
     if (this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
       for (let i = 0; i < this.pieces.length; i++) {
-          if (this.pieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
-            this.pieces.splice(i, 1);
-            break;
-          };
+        if (this.pieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
+          this.pieces.splice(i, 1);
+          break;
+        };
       }
     }
 
@@ -85,18 +97,25 @@ export default class ChessEngine {
     this.virtualChessBoard[newCoordinate.i][newCoordinate.j].coordinate = newCoordinate;
     this.virtualChessBoard[oldCoordinate.i][oldCoordinate.j] = null;
   }
-  
+
   private analize(): virtualMove {
     let avalibleMoves: virtualMove[] = this.getAvalibleMoves();
     let selectedMove: virtualMove;
-
-    // for (let i = 0; i < array.length; i++) {
-    //     array[i];
-    // }
-
     selectedMove = avalibleMoves[0];
-    this.movePiece(selectedMove.oldCoordinate, selectedMove.newCoordinate);
+    
+    for (let i = 0; i < avalibleMoves.length; i++) {
+      /*
+      * @TODO add emulateMove method
+      *
+      * let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
+      *
+      * if (newOpponentPiecesCount > this.opponentPiecesCount) {
+      *   selectedMove = avalibleMoves[i];
+      * }
+      */
+    }
 
+    this.movePiece(selectedMove.oldCoordinate, selectedMove.newCoordinate);
     return selectedMove;
   }
 
