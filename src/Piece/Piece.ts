@@ -1,7 +1,4 @@
-interface Coordinate {
-  i: number;
-  j: number;
-}
+import {Coordinate} from '../Types/Coordinate';
 
 export default abstract class Piece {
   protected whiteImageLink: string;

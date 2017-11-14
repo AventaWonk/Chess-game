@@ -1,11 +1,6 @@
+import {Coordinate} from './Types/Coordinate';
 import Piece from './Piece/Piece';
 import Pawn from './Piece/Pawn';
-
-
-interface Coordinate {
-  i: number;
-  j: number;
-}
 
 interface virtualBoardPoint {
   piece: Piece;
@@ -30,10 +25,10 @@ export default class ChessEngine {
   private callback: Function;
   private enginePiecesCount: number = 0;
   private opponentPiecesCount: number = 0;
-  private enginePiecesWight: number = 0;
-  private opponentPiecesWight: number = 0;
+  private enginePiecesWeight: number = 0;
+  private opponentPiecesWeight: number = 0;
 
-  constructor(player: any, picesSetup: virtualBoardPoint[], callback: Function) {
+  constructor(player: number, picesSetup: virtualBoardPoint[], callback: Function) {
     this.player = player;
     this.pieces = this.pieces.concat(picesSetup);
     this.virtualChessBoard = [[],[],[],[],[],[],[],[]];
@@ -43,13 +38,13 @@ export default class ChessEngine {
       let currentPiceSetup = this.pieces[i];
       this.virtualChessBoard[currentPiceSetup.coordinate.i][currentPiceSetup.coordinate.j] = currentPiceSetup;
 
-      if (currentPiceSetup.piece.getSide == player) {
+      if (currentPiceSetup.piece.getSide() == player) {
         this.opponentPiecesCount += 1;
-        this.opponentPiecesWight += currentPiceSetup.piece.getWeight();
+        this.opponentPiecesWeight += currentPiceSetup.piece.getWeight();
         continue;
       }
       this.enginePiecesCount += 1;
-      this.enginePiecesWight += currentPiceSetup.piece.getWeight();
+      this.enginePiecesWeight += currentPiceSetup.piece.getWeight();
     }
   }
 
@@ -101,22 +96,30 @@ export default class ChessEngine {
   private analize(): virtualMove {
     let avalibleMoves: virtualMove[] = this.getAvalibleMoves();
     let selectedMove: virtualMove;
-    selectedMove = avalibleMoves[0];
-    
+    selectedMove = avalibleMoves[Math.floor(Math.random() * (avalibleMoves.length))];
+
     for (let i = 0; i < avalibleMoves.length; i++) {
-      /*
-      * @TODO add emulateMove method
-      *
-      * let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
-      *
-      * if (newOpponentPiecesCount > this.opponentPiecesCount) {
-      *   selectedMove = avalibleMoves[i];
-      * }
-      */
+      let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
+
+      if (newOpponentPiecesCount < this.opponentPiecesCount) {
+       selectedMove = avalibleMoves[i];
+      }
     }
 
     this.movePiece(selectedMove.oldCoordinate, selectedMove.newCoordinate);
     return selectedMove;
+  }
+
+  private emulateMove(move: virtualMove): number {
+    let newOpponentPiecesCount = this.opponentPiecesCount;
+    let newOpponentPiecesWeight = this.opponentPiecesWeight;
+
+    if (this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j]) {
+      newOpponentPiecesWeight -= this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j].piece.getWeight();
+      newOpponentPiecesCount -= 1;
+    }
+
+    return newOpponentPiecesCount;
   }
 
   private getPiece() {
