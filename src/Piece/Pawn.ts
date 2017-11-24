@@ -17,25 +17,29 @@ export default class Pawn extends Piece {
       l = -1;
     }
 
-    if (!this.isOutOfBoard(coordinate.i + l, coordinate.j) && !chessBoard[coordinate.i + l][coordinate.j]) {
-      moves.push({
-        i: coordinate.i + l,
-        j: coordinate.j,
-      });
+    let vectorA: Coordinate = {
+      i: coordinate.i + l,
+      j: coordinate.j,
+    };
+    let vectorB: Coordinate = {
+      i: coordinate.i + l,
+      j: coordinate.j + l,
+    };
+    let vectorC: Coordinate = {
+      i: coordinate.i + l,
+      j: coordinate.j - l,
+    };
+
+    if (!this.isOutOfBoard(vectorA)) {
+      moves.push(vectorA);
     }
 
     if (chessBoard[coordinate.i + l][coordinate.j + l]) {
-      moves.push({
-        i: coordinate.i + l,
-        j: coordinate.j + l,
-      });
+      moves.push(vectorB);
     }
 
     if (chessBoard[coordinate.i + l][coordinate.j - l]) {
-      moves.push({
-        i: coordinate.i + l,
-        j: coordinate.j - l,
-      });
+      moves.push(vectorC);
     }
 
     return moves;

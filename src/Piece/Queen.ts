@@ -6,7 +6,7 @@ export default class Queen extends Piece {
     super(side);
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteQueen.png";
-    this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteQueen.png";
+    this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackQueen.png";
   }
 
   public getMoves(coordinate: Coordinate, chessBoard: any) {
@@ -19,15 +19,34 @@ export default class Queen extends Piece {
     let vectorB: Coordinate = {
       i: 0,
       j: coordinate.j,
+    };
+
+    let i, j;
+    if (coordinate.i + coordinate.j > 7) {
+      i = 0;
+      j = coordinate.i + coordinate.j;
+    } else {
+      i = coordinate.j - (7 - coordinate.i);
+      j = 7;
     }
+
     let vectorC: Coordinate = {
-      i: 0,
-      j: coordinate.j,
+      i: i,
+      j: j,
+    };
+
+    if (coordinate.j > coordinate.i) {
+      i = 0;
+      j = coordinate.j - coordinate.i;
+    } else {
+      i = coordinate.i - coordinate.j;
+      j = 0;
     }
-    let vectorD :Coordinate = {
-      i: 0,
-      j: coordinate.j,
-    }
+
+    let vectorD: Coordinate = {
+      i: i,
+      j: j,
+    };
 
     for (let i = 0; i < 8; i++) {
       let newPoint: Coordinate = {
@@ -40,8 +59,8 @@ export default class Queen extends Piece {
       }
 
       newPoint = {
-        i: vectorA.i + i,
-        j: vectorA.j,
+        i: vectorB.i + i,
+        j: vectorB.j,
       };
 
       if (!this.isOutOfBoard(newPoint)) {
@@ -49,8 +68,8 @@ export default class Queen extends Piece {
       }
 
       newPoint = {
-        i: vectorA.i + i,
-        j: vectorA.j + i,
+        i: vectorC.i + i,
+        j: vectorC.j - i,
       };
 
       if (!this.isOutOfBoard(newPoint)) {
@@ -58,13 +77,14 @@ export default class Queen extends Piece {
       }
 
       newPoint = {
-        i: vectorA.i - i,
-        j: vectorA.j + j,
+        i: vectorD.i + i,
+        j: vectorD.j + i,
       };
 
       if (!this.isOutOfBoard(newPoint)) {
         moves.push(newPoint);
       }
+    }
 
     return moves;
   }

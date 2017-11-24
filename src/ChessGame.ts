@@ -1,12 +1,8 @@
 import ChessEngine from './ChessEngine';
+import {Coordinate} from './Types/Coordinate';
 import Piece from './Piece/Piece';
 import Pawn from './Piece/Pawn';
-import {defaultPiecesSetup, defaultPiecesSetup2} from './PiecesSetup';
-
-interface Coordinate {
-  i: number;
-  j: number;
-}
+import {defaultPiecesSetup} from './PiecesSetup';
 
 interface virtualBoardPoint {
   piece: any;
@@ -38,13 +34,13 @@ export default class ChessGame {
     this.onMoveAnalizedCallback = this.onMoveAnalizedCallback.bind(this);
     this.chessBoardElement = this.createChessBoardElement();
 
-    if (this.player == ChessGame.WHTIE) {
-      this.setUpPiecesOnBoard(defaultPiecesSetup);
-    } else {
-      this.setUpPiecesOnBoard(defaultPiecesSetup2);
-    }
-
-    this.engine = new ChessEngine(player, defaultPiecesSetup2, this.onMoveAnalizedCallback);
+    // if (this.player == ChessGame.WHTIE) {
+    //   this.setUpPiecesOnBoard(defaultPiecesSetup);
+    // } else {
+    //   this.setUpPiecesOnBoard(defaultPiecesSetup2);
+    // }
+    this.setUpPiecesOnBoard(defaultPiecesSetup);
+    this.engine = new ChessEngine(player, defaultPiecesSetup, this.onMoveAnalizedCallback);
   }
 
   private onBoardClickCallback(e: Event) {

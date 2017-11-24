@@ -33,7 +33,7 @@ export default abstract class Piece {
     return this.weight;
   }
 
-  protected isOutOfBoard(i: number, j: number): boolean {
-    return (i > 7 || j > 7) || (i < 0 || j < 0);
+  protected isOutOfBoard(point: Coordinate): boolean {
+    return (point.i > 7 || point.j > 7) || (point.i < 0 || point.j < 0);
   }
 }
