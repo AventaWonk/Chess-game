@@ -60,11 +60,11 @@ export default class ChessEngine {
           let targetSquare = this.virtualChessBoard[avaliblePiecesMoves[i].i][avaliblePiecesMoves[i].j];
 
           if (targetSquare && (targetSquare.coordinate.i > 7 || targetSquare.coordinate.j > 7 || targetSquare.coordinate.j < 0 || targetSquare.coordinate.j < 0)) {
-            break;
+            continue;
           }
 
           if (targetSquare && targetSquare.piece.getSide() != this.player) {
-            break;
+            continue;
           }
 
           avalibleMoves.push({
