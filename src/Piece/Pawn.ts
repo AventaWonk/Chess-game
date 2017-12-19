@@ -34,11 +34,11 @@ export default class Pawn extends Piece {
       moves.push(vectorA);
     }
 
-    if (chessBoard[coordinate.i + l][coordinate.j + l]) {
+    if (!this.isOutOfBoard(vectorB)) {
       moves.push(vectorB);
     }
 
-    if (chessBoard[coordinate.i + l][coordinate.j - l]) {
+    if (!this.isOutOfBoard(vectorC)) {
       moves.push(vectorC);
     }
 
