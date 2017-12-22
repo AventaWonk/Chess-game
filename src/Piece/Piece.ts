@@ -36,4 +36,16 @@ export default abstract class Piece {
   protected isOutOfBoard(point: Coordinate): boolean {
     return (point.i > 7 || point.j > 7) || (point.i < 0 || point.j < 0);
   }
+
+  protected getValidMoves(points: Coordinate[]): Coordinate[] {
+    let validMoves = [];
+
+    for (let i = 0; i < points.length; i++) {
+      if (!this.isOutOfBoard(points[i])) {
+        validMoves.push(points[i]);
+      }
+    }
+
+    return validMoves;
+  }
 }
