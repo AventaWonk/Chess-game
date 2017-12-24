@@ -22,25 +22,16 @@ export default class Rook extends Piece {
     };
 
     for (let i = 0; i < 8; i++) {
-      let newPoint: Coordinate = {
+      moves.push({
         i: vectorA.i,
         j: vectorA.j + i,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
-      }
-
-      newPoint = {
+      });
+      moves.push({
         i: vectorB.i + i,
         j: vectorB.j,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
-      }
+      });
     }
 
-    return moves;
+    return this.getValidMoves(moves);
   }
 }

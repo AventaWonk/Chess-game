@@ -35,18 +35,15 @@ class King extends Piece {
       } else {
         vectorA.i - i
       }
-      if (!this.isOutOfBoard(vectorA)) {
-        moves.push(vectorA);
-      }
+      moves.push(vectorA);
+
 
       if (vectorB.i != 0) {
         vectorB.j + i;
       } else {
         vectorB.j - i
       }
-      if (!this.isOutOfBoard(vectorB)) {
-        moves.push(vectorB);
-      }
+      moves.push(vectorB);
 
       if (vectorC.i != 0) {
         vectorC.i + i;
@@ -55,11 +52,9 @@ class King extends Piece {
         vectorC.i - i
         vectorC.j + i;
       }
-      if (!this.isOutOfBoard(vectorC)) {
-        moves.push(vectorC);
-      }
+      moves.push(vectorC);
     }
 
-    return moves;
+    return this.getValidMoves(moves);
   }
 }

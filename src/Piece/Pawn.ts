@@ -17,31 +17,20 @@ export default class Pawn extends Piece {
       l = -1;
     }
 
-    let vectorA: Coordinate = {
+    moves.push({
       i: coordinate.i + l,
       j: coordinate.j,
-    };
-    let vectorB: Coordinate = {
+    });
+    moves.push({
       i: coordinate.i + l,
       j: coordinate.j + l,
-    };
-    let vectorC: Coordinate = {
+    });
+    moves.push({
       i: coordinate.i + l,
       j: coordinate.j - l,
-    };
+    });
 
-    if (!this.isOutOfBoard(vectorA)) {
-      moves.push(vectorA);
-    }
 
-    if (!this.isOutOfBoard(vectorB)) {
-      moves.push(vectorB);
-    }
-
-    if (!this.isOutOfBoard(vectorC)) {
-      moves.push(vectorC);
-    }
-
-    return moves;
+    return this.getValidMoves(moves);
   }
 }

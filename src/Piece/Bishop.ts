@@ -40,23 +40,15 @@ export default class Bishop extends Piece {
     };
 
     for (let i = 0; i < 8; i++) {
-      let newPoint = {
+      moves.push({
         i: vectorA.i + i,
         j: vectorA.j - i,
-      };
+      });
 
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
-      }
-
-      newPoint = {
+      moves.push({
         i: vectorB.i + i,
         j: vectorB.j + i,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
-      }
+      });
     }
 
     return moves;
