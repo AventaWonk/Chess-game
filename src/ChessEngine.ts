@@ -57,16 +57,12 @@ export default class ChessEngine {
         let avaliblePiecesMoves = currentPiece.piece.getMoves(currentPiece.coordinate, this.virtualChessBoard);
 
         for (let i = 0; i < avaliblePiecesMoves.length; i++) {
-          let targetSquare = this.virtualChessBoard[avaliblePiecesMoves[i].i][avaliblePiecesMoves[i].j];
-
-          if (targetSquare && targetSquare.piece.getSide() != this.player) {
-            continue;
+          if (this.moveIsValid(avalibleMoves[i])) {
+            avalibleMoves.push({
+              oldCoordinate: currentPiece.coordinate,
+              newCoordinate: avaliblePiecesMoves[i],
+            });
           }
-
-          avalibleMoves.push({
-            oldCoordinate: currentPiece.coordinate,
-            newCoordinate: avaliblePiecesMoves[i],
-          });
         }
       }
     }
@@ -118,21 +114,23 @@ export default class ChessEngine {
     return newOpponentPiecesCount;
   }
 
-  private getPiece() {
+  private moveIsValid(move: virtualMove) {
+    if (this.isOutOfBoard(move.newCoordinate)) {
+      return false;
+    }
 
+    let targetSquare = this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j];
+    if (targetSquare.piece.getSide() != this.player) {
+      return false;
+    }
+
+    return true;
   }
 
-  public position() {
-    // fo
+  protected isOutOfBoard(point: Coordinate): boolean {
+    return (point.i > 7 || point.j > 7) || (point.i < 0 || point.j < 0);
   }
 
-  public go() {
-    // fo
-  }
-
-  public stop() {
-
-  }
 
   public move(oldCoordinate: Coordinate, newCoordinate: Coordinate): any {
     this.movePiece(oldCoordinate, newCoordinate);
