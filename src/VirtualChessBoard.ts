@@ -5,22 +5,23 @@ interface Coordinate {
   y: number;
 }
 
-class virtualChessBoard {
+interface PiecesSetup {
+  coordinate: Coordinate;
+  piece: Piece;
+}
+
+export default class virtualChessboard {
   private chessBoard: Piece[][];
 
   constructor () {
     this.chessBoard = this.initializeChessBoard();
   }
 
-  public setUpPieces(piecesSetUp: any): void {
-    /*
-    / @TODO
-    /
-    / for (let i = 0; i < piecesSetUp.getArray().length; i++) {
-    /   this.chessBoard[x][y] = piecesSetUp.getArray()[i].getPiece();
-    / }
-    /
-    */
+  public setUpPieces(piecesSetUp: PiecesSetup[]): void {
+    for (let i = 0; i < piecesSetUp.length; i++) {
+      let currentPiece = piecesSetUp[i];
+      this.chessBoard[currentPiece.coordinate.x][currentPiece.coordinate.y] = piecesSetUp[i].piece;
+    }
   }
 
   public getPiece(x: number, y: number): Piece {
@@ -31,10 +32,16 @@ class virtualChessBoard {
     this.chessBoard[x][y] = piece;
   }
 
+  public removePiece(x: number, y: number): void {
+    this.chessBoard[x][y] = null;
+  }
+
   protected initializeChessBoard(): Piece[][]{
     let chessBoard: Piece[][] = [];
 
     for (let i = 0; i < 8; i++) {
+      chessBoard[i] = [];
+      
       for (let j = 0; j < 8; j++) {
         chessBoard[i][j] = null;
       }
