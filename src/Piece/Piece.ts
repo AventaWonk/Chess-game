@@ -34,7 +34,7 @@ export default abstract class Piece {
   }
 
   protected isOutOfBoard(point: Coordinate): boolean {
-    return (point.i > 7 || point.j > 7) || (point.i < 0 || point.j < 0);
+    return (point.x > 7 || point.y > 7) || (point.x < 0 || point.y < 0);
   }
 
   protected getValidMoves(points: Coordinate[]): Coordinate[] {

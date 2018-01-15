@@ -13,41 +13,41 @@ export default class Bishop extends Piece {
     let moves: Coordinate[] = [];
 
     let i, j;
-    if (coordinate.i + coordinate.j > 7) {
+    if (coordinate.x + coordinate.y > 7) {
       i = 0;
-      j = coordinate.i + coordinate.j;
+      j = coordinate.x + coordinate.y;
     } else {
-      i = coordinate.j - (7 - coordinate.i);
+      i = coordinate.y - (7 - coordinate.x);
       j = 7;
     }
 
     let vectorA: Coordinate = {
-      i: i,
-      j: j,
+      x: i,
+      y: j,
     };
 
-    if (coordinate.j > coordinate.i) {
+    if (coordinate.y > coordinate.x) {
       i = 0;
-      j = coordinate.j - coordinate.i;
+      j = coordinate.y - coordinate.x;
     } else {
-      i = coordinate.i - coordinate.j;
+      i = coordinate.x - coordinate.y;
       j = 0;
     }
 
     let vectorB: Coordinate = {
-      i: i,
-      j: j,
+      x: i,
+      y: j,
     };
 
     for (let i = 0; i < 8; i++) {
       moves.push({
-        i: vectorA.i + i,
-        j: vectorA.j - i,
+        x: vectorA.x + i,
+        y: vectorA.y - i,
       });
 
       moves.push({
-        i: vectorB.i + i,
-        j: vectorB.j + i,
+        x: vectorB.x+ i,
+        y: vectorB.y + i,
       });
     }
 

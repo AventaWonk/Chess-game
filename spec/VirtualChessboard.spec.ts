@@ -1,3 +1,6 @@
+import {Coordinate} from '../src/Types/Coordinate';
+import {PiecesSetup} from '../src/Types/PiecesSetup';
+import Piece from '../src/Piece/Piece';
 import Bishop from '../src/Piece/Bishop';
 import VirtualChessboard from '../src/VirtualChessboard';
 
@@ -17,10 +20,29 @@ describe("Virtual chessboard class test", () => {
     expect(vcb.getPiece(0, 0)).toEqual(null);
   });
 
-  /*
-  / @TODO
-  / it("checks setUpPieces method", () => {
-  /
-  / });
-  */
+  it("checks setUpPieces method", () => {
+    let bishop1 = new Bishop(0);
+    let bishop2 = new Bishop(1);
+    let piecesSetUp: PiecesSetup[] = [
+      {
+        piece: bishop1,
+        coordinate: {
+          x: 1,
+          y: 1
+        }
+      },
+      {
+        piece: bishop2,
+        coordinate: {
+          x: 2,
+          y: 2
+        }
+      },
+    ];
+    vcb.setUpPieces(piecesSetUp);
+
+    expect(vcb.getPiece(1, 1)).toEqual(bishop1);
+    expect(vcb.getPiece(2, 2)).toEqual(bishop2);
+  });
+
 });
