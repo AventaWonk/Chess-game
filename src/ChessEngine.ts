@@ -1,66 +1,66 @@
 import {Coordinate} from './Types/Coordinate';
+import {PiecesSetup} from './Types/PiecesSetup';
+import VirtualChessboard from './VirtualChessboard';
 import Piece from './Piece/Piece';
-import Pawn from './Piece/Pawn';
 
-interface virtualBoardPoint {
-  piece: Piece;
-  coordinate: Coordinate;
-}
-
+// interface virtualBoardPoint {
+//   piece: Piece;
+//   coordinate: Coordinate;
+// }
+//
 interface virtualMove {
   // pieceLink: Piece;
   oldCoordinate: Coordinate;
   newCoordinate: Coordinate;
 }
-
-interface virtualPiece {
-  piece: Piece;
-  coordinate: Coordinate;
-}
+//
+// interface virtualPiece {
+//   piece: Piece;
+//   coordinate: Coordinate;
+// }
 
 export default class ChessEngine {
   private player: number;
-  private virtualChessBoard: virtualPiece[][] = Array(8);
-  private pieces: virtualPiece[] = [];
+  private virtualChessBoard: VirtualChessboard;
   private callback: Function;
+
   private enginePiecesCount: number = 0;
   private opponentPiecesCount: number = 0;
   private enginePiecesWeight: number = 0;
   private opponentPiecesWeight: number = 0;
 
-  constructor(player: number, picesSetup: virtualBoardPoint[], callback: Function) {
+  constructor(player: number, picesSetup: PiecesSetup[], callback: Function) {
     this.player = player;
-    this.pieces = this.pieces.concat(picesSetup);
-    this.virtualChessBoard = [[],[],[],[],[],[],[],[]];
+    this.virtualChessBoard = new VirtualChessboard();
+    this.virtualChessBoard.setUpPieces(picesSetup);
     this.callback = callback;
 
-    for (let i = 0; i < this.pieces.length; i++) {
-      let currentPiceSetup = this.pieces[i];
-      this.virtualChessBoard[currentPiceSetup.coordinate.i][currentPiceSetup.coordinate.j] = currentPiceSetup;
-
-      if (currentPiceSetup.piece.getSide() == player) {
+    let allPieces = this.virtualChessBoard.getAllPieces();
+    for (let i = 0; i < allPieces.length; i++) {
+      let currentPice = allPieces[i];
+      if (currentPice.getSide() == player) {
         this.opponentPiecesCount += 1;
-        this.opponentPiecesWeight += currentPiceSetup.piece.getWeight();
+        this.opponentPiecesWeight += currentPice.getWeight();
         continue;
       }
       this.enginePiecesCount += 1;
-      this.enginePiecesWeight += currentPiceSetup.piece.getWeight();
+      this.enginePiecesWeight += currentPice.getWeight();
     }
   }
 
   private getAvalibleMoves() {
     let avalibleMoves: virtualMove[] = [];
 
-    for (let i = 0; i < this.pieces.length; i++) {
-      if (this.pieces[i].piece.getSide() != this.player) {
-        let currentPiece = this.pieces[i];
-        let avaliblePiecesMoves = currentPiece.piece.getMoves(currentPiece.coordinate, this.virtualChessBoard);
+    for (let i = 0; i < this.virtualPieces.length; i++) {
+      if (this.virtualPieces[i].piece.getSide() != this.player) {
+        let currentPiece = this.virtualPieces[i];
+        let avaliblePieceMoves = currentPiece.piece.getMoves(currentPiece.coordinate, this.virtualChessBoard);
 
-        for (let i = 0; i < avaliblePiecesMoves.length; i++) {
+        for (let i = 0; i < avaliblePieceMoves.length; i++) {
           if (this.moveIsValid(avalibleMoves[i])) {
             avalibleMoves.push({
               oldCoordinate: currentPiece.coordinate,
-              newCoordinate: avaliblePiecesMoves[i],
+              newCoordinate: avaliblePieceMoves[i],
             });
           }
         }
@@ -72,9 +72,9 @@ export default class ChessEngine {
 
   private movePiece(oldCoordinate: Coordinate, newCoordinate: Coordinate) {
     if (this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
-      for (let i = 0; i < this.pieces.length; i++) {
-        if (this.pieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
-          this.pieces.splice(i, 1);
+      for (let i = 0; i < this.virtualPieces.length; i++) {
+        if (this.virtualPieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
+          this.virtualPieces.splice(i, 1);
           break;
         };
       }
