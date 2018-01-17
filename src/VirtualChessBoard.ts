@@ -36,12 +36,26 @@ export default class virtualChessboard {
     this.chessBoard[x][y] = null;
   }
 
+  public getAllPieces(): Piece[] {
+    let allPieces: Piece[] = [];
+
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (this.chessBoard[i][j]) {
+          allPieces.push(this.chessBoard[i][j]);
+        }
+      }
+    }
+
+    return allPieces;
+  }
+
   protected initializeChessBoard(): Piece[][]{
     let chessBoard: Piece[][] = [];
 
     for (let i = 0; i < 8; i++) {
       chessBoard[i] = [];
-      
+
       for (let j = 0; j < 8; j++) {
         chessBoard[i][j] = null;
       }

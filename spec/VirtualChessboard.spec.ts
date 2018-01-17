@@ -45,4 +45,31 @@ describe("Virtual chessboard class test", () => {
     expect(vcb.getPiece(2, 2)).toEqual(bishop2);
   });
 
+  it("checks getAllPieces method", () => {
+    let bishop1 = new Bishop(0);
+    let bishop2 = new Bishop(1);
+    let piecesSetUp: PiecesSetup[] = [
+      {
+        piece: bishop1,
+        coordinate: {
+          x: 1,
+          y: 1
+        }
+      },
+      {
+        piece: bishop2,
+        coordinate: {
+          x: 2,
+          y: 2
+        }
+      },
+    ];
+    vcb.setUpPieces(piecesSetUp);
+
+    expect(vcb.getAllPieces()).toEqual([
+      bishop1,
+      bishop2
+    ]);
+  });
+
 });
