@@ -2,22 +2,22 @@ import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
 export default class Bishop extends Piece {
-  constructor(side: number) {
-    super(side);
+  constructor(side: number, position: Coordinate) {
+    super(side, position);
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteBishop.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackBishop.png";
   }
 
-  public getMoves(coordinate: Coordinate, chessBoard: any) {
+  public getMoves() {
     let moves: Coordinate[] = [];
 
     let i, j;
-    if (coordinate.x + coordinate.y > 7) {
+    if (this.position.x + this.position.y > 7) {
       i = 0;
-      j = coordinate.x + coordinate.y;
+      j = this.position.x + this.position.y;
     } else {
-      i = coordinate.y - (7 - coordinate.x);
+      i = this.position.y - (7 - this.position.x);
       j = 7;
     }
 
@@ -26,11 +26,11 @@ export default class Bishop extends Piece {
       y: j,
     };
 
-    if (coordinate.y > coordinate.x) {
+    if (this.position.y > this.position.x) {
       i = 0;
-      j = coordinate.y - coordinate.x;
+      j = this.position.y - this.position.x;
     } else {
-      i = coordinate.x - coordinate.y;
+      i = this.position.x - this.position.y;
       j = 0;
     }
 

@@ -1,26 +1,16 @@
 import Piece from './Piece/Piece';
-
-interface Coordinate {
-  x: number;
-  y: number;
-}
-
-interface PiecesSetup {
-  coordinate: Coordinate;
-  piece: Piece;
-}
+import {Coordinate} from './Types/Coordinate';
 
 export default class virtualChessboard {
   private chessBoard: Piece[][];
 
   constructor () {
-    this.chessBoard = this.initializeChessBoard();
+    this.initializeChessBoard();
   }
 
-  public setUpPieces(piecesSetUp: PiecesSetup[]): void {
+  public setUpPieces(piecesSetUp: Piece[]): void {
     for (let i = 0; i < piecesSetUp.length; i++) {
-      let currentPiece = piecesSetUp[i];
-      this.chessBoard[currentPiece.coordinate.x][currentPiece.coordinate.y] = piecesSetUp[i].piece;
+      this.addPiece(piecesSetUp[i])
     }
   }
 
@@ -28,7 +18,18 @@ export default class virtualChessboard {
     return this.chessBoard[x][y];
   }
 
-  public setPiece(x: number, y: number, piece: Piece): void {
+  public setPiece(piece: Piece, x: number, y: number): void {
+    this.chessBoard[x][y] = piece;
+    this.chessBoard[x][y].updatePosition({
+      x: x,
+      y: y
+    });
+  }
+
+  public addPiece(piece: Piece): void {
+    let x = piece.getWPosition().x;
+    let y = piece.getWPosition().y;
+
     this.chessBoard[x][y] = piece;
   }
 
@@ -50,17 +51,15 @@ export default class virtualChessboard {
     return allPieces;
   }
 
-  protected initializeChessBoard(): Piece[][]{
-    let chessBoard: Piece[][] = [];
+  protected initializeChessBoard(): void {
+    this.chessBoard = [];
 
     for (let i = 0; i < 8; i++) {
-      chessBoard[i] = [];
+      this.chessBoard[i] = [];
 
       for (let j = 0; j < 8; j++) {
-        chessBoard[i][j] = null;
+        this.chessBoard[i][j] = null;
       }
     }
-
-    return chessBoard;
   }
 }

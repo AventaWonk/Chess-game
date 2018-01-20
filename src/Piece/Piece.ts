@@ -3,14 +3,17 @@ import {Coordinate} from '../Types/Coordinate';
 export default abstract class Piece {
   protected whiteImageLink: string;
   protected blackImageLink: string;
+  protected position: Coordinate;
   protected weight: number = 0;
   protected side: number;
 
-  constructor(side: number) {
+
+  constructor(side: number, position: Coordinate) {
     this.side = side;
+    this.position = position;
   }
 
-  public abstract getMoves(coordinate: Coordinate, chessBoard: any): Coordinate[];
+  public abstract getMoves(): Coordinate[];
 
   public getImage(imageSize: string): HTMLImageElement {
     let img = document.createElement("img");
@@ -25,12 +28,20 @@ export default abstract class Piece {
     return img;
   }
 
-  public getSide() {
+  public getSide(): number {
     return this.side;
   }
 
-  public getWeight() {
+  public getWeight(): number {
     return this.weight;
+  }
+
+  public updatePosition(position: Coordinate): void {
+    this.position = position;
+  }
+
+  public getWPosition(): Coordinate {
+    return this.position;
   }
 
   protected isOutOfBoard(point: Coordinate): boolean {
