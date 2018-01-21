@@ -51,6 +51,6 @@ export default class Bishop extends Piece {
       });
     }
 
-    return moves;
+    return this.getValidMoves(moves);
   }
 }

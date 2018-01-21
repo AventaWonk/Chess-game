@@ -2,14 +2,14 @@ import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
 export default class Queen extends Piece {
-  constructor(side: number) {
-    super(side);
+  constructor(side: number, position: Coordinate) {
+    super(side, position);
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteQueen.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackQueen.png";
   }
 
-  public getMoves(coordinate: Coordinate, chessBoard: any) {
+  public getMoves() {
     let moves: Coordinate[] = [];
 
     let vectorA: Coordinate = {

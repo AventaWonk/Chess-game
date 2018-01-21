@@ -1,56 +1,56 @@
 import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
-class King extends Piece {
-  constructor(side: number) {
-    super(side);
+export default class King extends Piece {
+  constructor(side: number, position: Coordinate) {
+    super(side, position);
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteKing.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackKing.png";
   }
 
-  public getMoves(coordinate: Coordinate, chessBoard: any) {
+  public getMoves() {
     let moves: Coordinate[] = [];
 
     let vectorA: Coordinate = {
-      i: coordinate.i,
-      j: coordinate.j,
+      x: this.position.x,
+      y: this.position.y,
     };
     let vectorB: Coordinate = {
-      i: coordinate.i,
-      j: coordinate.j,
+      x: this.position.x,
+      y: this.position.y,
     };
     let vectorC: Coordinate = {
-      i: coordinate.i,
-      j: coordinate.j,
+      x: this.position.x,
+      y: this.position.y,
     };
     let vectorD: Coordinate = {
-      i: coordinate.i,
-      j: coordinate.j,
+      x: this.position.x,
+      y: this.position.y,
     };
 
     for (let i = 0; i < 3; i++) {
-      if (vectorA.i != 0) {
-        vectorA.i + i;
+      if (vectorA.x != 0) {
+        vectorA.x + i;
       } else {
-        vectorA.i - i
+        vectorA.x - i
       }
       moves.push(vectorA);
 
 
-      if (vectorB.i != 0) {
-        vectorB.j + i;
+      if (vectorB.x != 0) {
+        vectorB.y + i;
       } else {
-        vectorB.j - i
+        vectorB.y - i
       }
       moves.push(vectorB);
 
-      if (vectorC.i != 0) {
-        vectorC.i + i;
-        vectorC.j + i;
+      if (vectorC.x != 0) {
+        vectorC.x + i;
+        vectorC.y + i;
       } else {
-        vectorC.i - i
-        vectorC.j + i;
+        vectorC.x - i
+        vectorC.y + i;
       }
       moves.push(vectorC);
     }
