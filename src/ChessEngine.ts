@@ -1,23 +1,9 @@
 import {Coordinate} from './Types/Coordinate';
-import {PiecesSetup} from './Types/PiecesSetup';
+import {VirtualMove} from './Types/VirtualMove';
 import VirtualChessboard from './VirtualChessboard';
 import Piece from './Piece/Piece';
 
-// interface virtualBoardPoint {
-//   piece: Piece;
-//   coordinate: Coordinate;
-// }
-//
-interface virtualMove {
-  // pieceLink: Piece;
-  oldCoordinate: Coordinate;
-  newCoordinate: Coordinate;
-}
-//
-// interface virtualPiece {
-//   piece: Piece;
-//   coordinate: Coordinate;
-// }
+
 
 export default class ChessEngine {
   private player: number;
@@ -29,7 +15,7 @@ export default class ChessEngine {
   private enginePiecesWeight: number = 0;
   private opponentPiecesWeight: number = 0;
 
-  constructor(player: number, picesSetup: PiecesSetup[], callback: Function) {
+  constructor(player: number, picesSetup: Piece[], callback: Function) {
     this.player = player;
     this.virtualChessBoard = new VirtualChessboard();
     this.virtualChessBoard.setUpPieces(picesSetup);
@@ -50,19 +36,22 @@ export default class ChessEngine {
 
   private getAvalibleMoves() {
     let avalibleMoves: virtualMove[] = [];
+    let allPieces = this.virtualChessBoard.getAllPieces();
 
-    for (let i = 0; i < this.virtualPieces.length; i++) {
-      if (this.virtualPieces[i].piece.getSide() != this.player) {
-        let currentPiece = this.virtualPieces[i];
-        let avaliblePieceMoves = currentPiece.piece.getMoves(currentPiece.coordinate, this.virtualChessBoard);
+    for (let i = 0; i < allPieces.length; i++) {
+      let currentPiece = allPieces[i];
 
-        for (let i = 0; i < avaliblePieceMoves.length; i++) {
-          if (this.moveIsValid(avalibleMoves[i])) {
-            avalibleMoves.push({
-              oldCoordinate: currentPiece.coordinate,
-              newCoordinate: avaliblePieceMoves[i],
-            });
-          }
+      if (currentPiece.getSide() != this.player) {
+        continue;
+      }
+
+      let avaliblePieceMoves = currentPiece.getMoves();
+      for (let i = 0; i < avaliblePieceMoves.length; i++) {
+        if (this.moveIsValid(avalibleMoves[i])) {
+          avalibleMoves.push({
+            oldCoordinate: currentPiece.getWPosition(),
+            newCoordinate: avaliblePieceMoves[i],
+          });
         }
       }
     }
@@ -71,47 +60,49 @@ export default class ChessEngine {
   }
 
   private movePiece(oldCoordinate: Coordinate, newCoordinate: Coordinate) {
-    if (this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
-      for (let i = 0; i < this.virtualPieces.length; i++) {
-        if (this.virtualPieces[i] == this.virtualChessBoard[newCoordinate.i][newCoordinate.j]) {
-          this.virtualPieces.splice(i, 1);
-          break;
-        };
-      }
+    let movablePiece = this.virtualChessBoard.getPiece(oldCoordinate.x, oldCoordinate.y);
+
+    if (!movablePiece) {
+      throw new Error("");
     }
 
-    this.virtualChessBoard[newCoordinate.i][newCoordinate.j] = this.virtualChessBoard[oldCoordinate.i][oldCoordinate.j];
-    this.virtualChessBoard[newCoordinate.i][newCoordinate.j].coordinate = newCoordinate;
-    this.virtualChessBoard[oldCoordinate.i][oldCoordinate.j] = null;
+    this.virtualChessBoard.setPiece(movablePiece, newCoordinate.x, newCoordinate.y);
+    this.virtualChessBoard.removePiece(newCoordinate.x, newCoordinate.y);
+
+    /* @TODO
+    /
+    / recalculate stats
+    /
+    */
   }
 
   private analize(): virtualMove {
     let avalibleMoves: virtualMove[] = this.getAvalibleMoves();
-    let selectedMove: virtualMove;
-    selectedMove = avalibleMoves[Math.floor(Math.random() * (avalibleMoves.length))];
+    let lastSelectedMove: virtualMove;
+    lastSelectedMove = avalibleMoves[Math.floor(Math.random() * (avalibleMoves.length))];
 
     for (let i = 0; i < avalibleMoves.length; i++) {
-      let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
-
-      if (newOpponentPiecesCount < this.opponentPiecesCount) {
-       selectedMove = avalibleMoves[i];
-      }
+      // let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
+      //
+      // if (newOpponentPiecesCount < this.opponentPiecesCount) {
+      //  lastSelectedMove = avalibleMoves[i];
+      // }
     }
 
-    this.movePiece(selectedMove.oldCoordinate, selectedMove.newCoordinate);
-    return selectedMove;
+    this.movePiece(lastSelectedMove.oldCoordinate, lastSelectedMove.newCoordinate);
+    return lastSelectedMove;
   }
 
   private emulateMove(move: virtualMove): number {
-    let newOpponentPiecesCount = this.opponentPiecesCount;
-    let newOpponentPiecesWeight = this.opponentPiecesWeight;
-
-    if (this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j]) {
-      newOpponentPiecesWeight -= this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j].piece.getWeight();
-      newOpponentPiecesCount -= 1;
-    }
-
-    return newOpponentPiecesCount;
+    // let newOpponentPiecesCount = this.opponentPiecesCount;
+    // let newOpponentPiecesWeight = this.opponentPiecesWeight;
+    //
+    // if (this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j]) {
+    //   newOpponentPiecesWeight -= this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j].piece.getWeight();
+    //   newOpponentPiecesCount -= 1;
+    // }
+    //
+    // return newOpponentPiecesCount;
   }
 
   private moveIsValid(move: virtualMove) {
@@ -119,8 +110,8 @@ export default class ChessEngine {
       return false;
     }
 
-    let targetSquare = this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j];
-    if (targetSquare.piece.getSide() != this.player) {
+    let targetPiece = this.virtualChessBoard.getPiece(move.newCoordinate.x, move.newCoordinate.y);
+    if (targetPiece && targetPiece.getSide() != this.player) {
       return false;
     }
 
@@ -128,7 +119,7 @@ export default class ChessEngine {
   }
 
   protected isOutOfBoard(point: Coordinate): boolean {
-    return (point.i > 7 || point.j > 7) || (point.i < 0 || point.j < 0);
+    return (point.x > 7 || point.y > 7) || (point.x < 0 || point.y < 0);
   }
 
 
