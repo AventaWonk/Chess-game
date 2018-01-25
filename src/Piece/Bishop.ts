@@ -12,45 +12,24 @@ export default class Bishop extends Piece {
   public getMoves() {
     let moves: Coordinate[] = [];
 
-    let i, j;
-    if (this.position.x + this.position.y > 7) {
-      i = 0;
-      j = this.position.x + this.position.y;
-    } else {
-      i = this.position.y - (7 - this.position.x);
-      j = 7;
+    for (let x = 0; x < 8; x++) {
+      let y1 = x - this.position.x + this.position.y; // 135 deg
+      let y2 = this.position.x - x + this.position.y; // 45 deg
+
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y1
+        });
+      }
+      if (y2 >= 0 && y2 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y2
+        });
+      }
     }
 
-    let vectorA: Coordinate = {
-      x: i,
-      y: j,
-    };
-
-    if (this.position.y > this.position.x) {
-      i = 0;
-      j = this.position.y - this.position.x;
-    } else {
-      i = this.position.x - this.position.y;
-      j = 0;
-    }
-
-    let vectorB: Coordinate = {
-      x: i,
-      y: j,
-    };
-
-    for (let i = 0; i < 8; i++) {
-      moves.push({
-        x: vectorA.x + i,
-        y: vectorA.y - i,
-      });
-
-      moves.push({
-        x: vectorB.x+ i,
-        y: vectorB.y + i,
-      });
-    }
-
-    return this.getValidMoves(moves);
+    return moves;
   }
 }
