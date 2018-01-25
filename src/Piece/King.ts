@@ -12,49 +12,36 @@ export default class King extends Piece {
   public getMoves() {
     let moves: Coordinate[] = [];
 
-    let vectorA: Coordinate = {
-      x: this.position.x,
-      y: this.position.y,
-    };
-    let vectorB: Coordinate = {
-      x: this.position.x,
-      y: this.position.y,
-    };
-    let vectorC: Coordinate = {
-      x: this.position.x,
-      y: this.position.y,
-    };
-    let vectorD: Coordinate = {
-      x: this.position.x,
-      y: this.position.y,
-    };
+    for (let x = this.position.x - 1; x < this.position.x + 2; x++) {
+      let y1 = x - this.position.x + this.position.y; // 135 deg
+      let y2 = this.position.x - x + this.position.y; // 45 deg
 
-    for (let i = 0; i < 3; i++) {
-      if (vectorA.x != 0) {
-        vectorA.x + i;
-      } else {
-        vectorA.x - i
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y1
+        });
       }
-      moves.push(vectorA);
-
-
-      if (vectorB.x != 0) {
-        vectorB.y + i;
-      } else {
-        vectorB.y - i
+      if (y2 >= 0 && y2 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y2
+        });
       }
-      moves.push(vectorB);
-
-      if (vectorC.x != 0) {
-        vectorC.x + i;
-        vectorC.y + i;
-      } else {
-        vectorC.x - i
-        vectorC.y + i;
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: this.position.y
+        });
       }
-      moves.push(vectorC);
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: this.position.x,
+          y: x
+        });
+      }
     }
 
-    return this.getValidMoves(moves);
+    return moves;
   }
 }
