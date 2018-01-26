@@ -12,26 +12,21 @@ export default class Rook extends Piece {
   public getMoves() {
     let moves: Coordinate[] = [];
 
-    let vectorA: Coordinate = {
-      x: this.position.x,
-      y: 0,
-    };
-    let vectorB: Coordinate = {
-      x: 0,
-      y: this.position.y,
-    };
-
-    for (let i = 0; i < 8; i++) {
-      moves.push({
-        x: vectorA.x,
-        y: vectorA.y + i,
-      });
-      moves.push({
-        x: vectorB.x + i,
-        y: vectorB.y,
-      });
+    for (let x = 0; x < 8; x++) {
+      if (x != this.position.x) {
+        moves.push({
+          x: x,
+          y: this.position.y
+        });
+      }
+      if (x != this.position.y) {
+        moves.push({
+          x: this.position.x,
+          y: x
+        });
+      }
     }
 
-    return this.getValidMoves(moves);
+    return moves;
   }
 }

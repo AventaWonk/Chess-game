@@ -12,77 +12,33 @@ export default class Queen extends Piece {
   public getMoves() {
     let moves: Coordinate[] = [];
 
-    let vectorA: Coordinate = {
-      i: coordinate.i,
-      j: 0,
-    };
-    let vectorB: Coordinate = {
-      i: 0,
-      j: coordinate.j,
-    };
+    for (let x = 0; x < 8; x++) {
+      let y1 = x - this.position.x + this.position.y; // 135 deg
+      let y2 = this.position.x - x + this.position.y; // 45 deg
 
-    let i, j;
-    if (coordinate.i + coordinate.j > 7) {
-      i = 0;
-      j = coordinate.i + coordinate.j;
-    } else {
-      i = coordinate.j - (7 - coordinate.i);
-      j = 7;
-    }
-
-    let vectorC: Coordinate = {
-      i: i,
-      j: j,
-    };
-
-    if (coordinate.j > coordinate.i) {
-      i = 0;
-      j = coordinate.j - coordinate.i;
-    } else {
-      i = coordinate.i - coordinate.j;
-      j = 0;
-    }
-
-    let vectorD: Coordinate = {
-      i: i,
-      j: j,
-    };
-
-    for (let i = 0; i < 8; i++) {
-      let newPoint: Coordinate = {
-        i: vectorA.i,
-        j: vectorA.j + i,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y1
+        });
       }
-
-      newPoint = {
-        i: vectorB.i + i,
-        j: vectorB.j,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
+      if (y2 >= 0 && y2 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: y2
+        });
       }
-
-      newPoint = {
-        i: vectorC.i + i,
-        j: vectorC.j - i,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: x,
+          y: this.position.y
+        });
       }
-
-      newPoint = {
-        i: vectorD.i + i,
-        j: vectorD.j + i,
-      };
-
-      if (!this.isOutOfBoard(newPoint)) {
-        moves.push(newPoint);
+      if (y1 >= 0 && y1 <= 7 && x != this.position.x) {
+        moves.push({
+          x: this.position.x,
+          y: x
+        });
       }
     }
 

@@ -25,7 +25,7 @@ export default class ChessEngine {
     for (let i = 0; i < allPieces.length; i++) {
       let currentPice = allPieces[i];
       if (currentPice.getSide() == player) {
-        this.opponentPiecesCount += 1;
+        this.opponentPiecesCount += 1;// TODO: 
         this.opponentPiecesWeight += currentPice.getWeight();
         continue;
       }
