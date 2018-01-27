@@ -3,39 +3,20 @@ import {VirtualMove} from './Types/VirtualMove';
 import VirtualChessboard from './VirtualChessboard';
 import Piece from './Piece/Piece';
 
-
-
 export default class ChessEngine {
   private player: number;
   private virtualChessBoard: VirtualChessboard;
-  private callback: Function;
+  private onMoveDeterminedEvent: Function;
 
-  private enginePiecesCount: number = 0;
-  private opponentPiecesCount: number = 0;
-  private enginePiecesWeight: number = 0;
-  private opponentPiecesWeight: number = 0;
-
-  constructor(player: number, picesSetup: Piece[], callback: Function) {
+  constructor(player: number, picesSetup: Piece[], onMoveDeterminedEvent: Function) {
     this.player = player;
     this.virtualChessBoard = new VirtualChessboard();
     this.virtualChessBoard.setUpPieces(picesSetup);
-    this.callback = callback;
-
-    let allPieces = this.virtualChessBoard.getAllPieces();
-    for (let i = 0; i < allPieces.length; i++) {
-      let currentPice = allPieces[i];
-      if (currentPice.getSide() == player) {
-        this.opponentPiecesCount += 1;// TODO: 
-        this.opponentPiecesWeight += currentPice.getWeight();
-        continue;
-      }
-      this.enginePiecesCount += 1;
-      this.enginePiecesWeight += currentPice.getWeight();
-    }
+    this.onMoveDeterminedEvent = onMoveDeterminedEvent;
   }
 
-  private getAvalibleMoves() {
-    let avalibleMoves: virtualMove[] = [];
+  private getAvalibleMoves(): VirtualMove[] {
+    let avalibleMoves: VirtualMove[] = [];
     let allPieces = this.virtualChessBoard.getAllPieces();
 
     for (let i = 0; i < allPieces.length; i++) {
@@ -45,88 +26,57 @@ export default class ChessEngine {
         continue;
       }
 
-      let avaliblePieceMoves = currentPiece.getMoves();
-      for (let i = 0; i < avaliblePieceMoves.length; i++) {
-        if (this.moveIsValid(avalibleMoves[i])) {
-          avalibleMoves.push({
-            oldCoordinate: currentPiece.getWPosition(),
-            newCoordinate: avaliblePieceMoves[i],
-          });
-        }
-      }
+      let avaliblePieceMoves = currentPiece.getMoves(); // TODO: validate in getMoves()
+      avalibleMoves.push({
+        position: allPieces[i].getWPosition(),
+        newPoints: avaliblePieceMoves,
+      });
     }
 
     return avalibleMoves;
   }
 
-  private movePiece(oldCoordinate: Coordinate, newCoordinate: Coordinate) {
+  private validateMove(oldCoordinate: Coordinate, newCoordinate: Coordinate): boolean {
     let movablePiece = this.virtualChessBoard.getPiece(oldCoordinate.x, oldCoordinate.y);
 
     if (!movablePiece) {
-      throw new Error("");
-    }
-
-    this.virtualChessBoard.setPiece(movablePiece, newCoordinate.x, newCoordinate.y);
-    this.virtualChessBoard.removePiece(newCoordinate.x, newCoordinate.y);
-
-    /* @TODO
-    /
-    / recalculate stats
-    /
-    */
-  }
-
-  private analize(): virtualMove {
-    let avalibleMoves: virtualMove[] = this.getAvalibleMoves();
-    let lastSelectedMove: virtualMove;
-    lastSelectedMove = avalibleMoves[Math.floor(Math.random() * (avalibleMoves.length))];
-
-    for (let i = 0; i < avalibleMoves.length; i++) {
-      // let newOpponentPiecesCount = this.emulateMove(avalibleMoves[i])
-      //
-      // if (newOpponentPiecesCount < this.opponentPiecesCount) {
-      //  lastSelectedMove = avalibleMoves[i];
-      // }
-    }
-
-    this.movePiece(lastSelectedMove.oldCoordinate, lastSelectedMove.newCoordinate);
-    return lastSelectedMove;
-  }
-
-  private emulateMove(move: virtualMove): number {
-    // let newOpponentPiecesCount = this.opponentPiecesCount;
-    // let newOpponentPiecesWeight = this.opponentPiecesWeight;
-    //
-    // if (this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j]) {
-    //   newOpponentPiecesWeight -= this.virtualChessBoard[move.newCoordinate.i][move.newCoordinate.j].piece.getWeight();
-    //   newOpponentPiecesCount -= 1;
-    // }
-    //
-    // return newOpponentPiecesCount;
-  }
-
-  private moveIsValid(move: virtualMove) {
-    if (this.isOutOfBoard(move.newCoordinate)) {
       return false;
     }
 
-    let targetPiece = this.virtualChessBoard.getPiece(move.newCoordinate.x, move.newCoordinate.y);
-    if (targetPiece && targetPiece.getSide() != this.player) {
+    if (movablePiece.getSide() != this.player) {
+      return false;
+    }
+
+    if ((newCoordinate.x > 7 || newCoordinate.y > 7) || (newCoordinate.x < 0 || newCoordinate.y < 0)) {
       return false;
     }
 
     return true;
   }
 
-  protected isOutOfBoard(point: Coordinate): boolean {
-    return (point.x > 7 || point.y > 7) || (point.x < 0 || point.y < 0);
+  public analize(): void {
+    let lastSelectedMove: VirtualMove;
+    let avalibleMoves: VirtualMove[] = this.getAvalibleMoves();
+
+    for (let i = 0; i < avalibleMoves.length; i++) {
+      // TODO: Use alpha–beta pruning
+    }
+
+    if (!lastSelectedMove) {
+      throw new Error("");
+    }
+
+    this.onMoveDeterminedEvent(lastSelectedMove);
   }
 
+  public move(oldCoordinate: Coordinate, newCoordinate: Coordinate): void {
+    let movablePiece = this.virtualChessBoard.getPiece(oldCoordinate.x, oldCoordinate.y);
 
-  public move(oldCoordinate: Coordinate, newCoordinate: Coordinate): any {
-    this.movePiece(oldCoordinate, newCoordinate);
+    if (!this.validateMove(oldCoordinate, newCoordinate)) {
+      throw new Error("");
+    }
 
-    let selectedMove = this.analize();
-    this.callback(selectedMove.oldCoordinate, selectedMove.newCoordinate)
+    this.virtualChessBoard.setPiece(movablePiece, newCoordinate.x, newCoordinate.y);
+    this.virtualChessBoard.removePiece(newCoordinate.x, newCoordinate.y);
   }
 }
