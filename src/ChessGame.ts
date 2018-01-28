@@ -2,12 +2,6 @@ import ChessEngine from './ChessEngine';
 import {Coordinate} from './Types/Coordinate';
 import Piece from './Piece/Piece';
 import Pawn from './Piece/Pawn';
-import {defaultPiecesSetup} from './PiecesSetup';
-
-interface virtualBoardPoint {
-  piece: any;
-  coordinate: Coordinate;
-}
 
 interface BoardPoint {
   piece: Piece;
@@ -22,42 +16,36 @@ export default class ChessGame {
   private static WHITE_SQUARE_COLOR = "#ffccb3";
   private static BLACK_SQUARE_COLOR = "#af6744";
   private player: number;
-  private selectedPiece: virtualBoardPoint = null;
-  private chessBoard: BoardPoint[][] = Array(8);
+  // private selectedPiece: virtualBoardPoint = null;
+  private chessBoard: BoardPoint[][];
   private chessBoardElement: HTMLElement;
   private engine: ChessEngine;
 
   constructor(player: number) {
     this.player = player;
-    this.chessBoard = [[],[],[],[],[],[],[],[]];
-    this.onBoardClickCallback = this.onBoardClickCallback.bind(this);
-    this.onMoveAnalizedCallback = this.onMoveAnalizedCallback.bind(this);
-    this.chessBoardElement = this.createChessBoardElement();
-
-    // if (this.player == ChessGame.WHTIE) {
-    //   this.setUpPiecesOnBoard(defaultPiecesSetup);
-    // } else {
-    //   this.setUpPiecesOnBoard(defaultPiecesSetup2);
-    // }
-    this.setUpPiecesOnBoard(defaultPiecesSetup);
-    this.engine = new ChessEngine(player, defaultPiecesSetup, this.onMoveAnalizedCallback);
+    this.initializeChessboardElement();
+    this.setUpPiecesOnBoard();
+    this.onBoardClickEvent = this.onBoardClickEvent.bind(this);
+    this.onMoveAnalizedEvent = this.onMoveAnalizedEvent.bind(this);
+    // this.engine = new ChessEngine(player, defaultPiecesSetup, this.onMoveAnalizedEvent);
   }
 
-  private onBoardClickCallback(e: Event) {
+  private onBoardClickEvent(e: Event) {
     let target = e.target as HTMLElement;
 
     if (target.nodeName != "TD") {
       target = target.parentNode as HTMLElement;
     }
 
-    let i: number, j: number;
-    if (!target.dataset.i || !target.dataset.j) {
+    let x: number;
+    let y: number;
+    if (!target.dataset.x || !target.dataset.y) {
       return;
     }
 
-    i = parseInt(target.dataset.i, 10);
-    j = parseInt(target.dataset.j, 10);
-    let current = this.chessBoard[i][j];
+    x = parseInt(target.dataset.x, 10);
+    y = parseInt(target.dataset.y, 10);
+    let current = this.chessBoard[x][y];
     let coordinate = {
       i: i,
       j: j,
@@ -86,69 +74,67 @@ export default class ChessGame {
     }
   }
 
-  private onMoveAnalizedCallback(coordinate: Coordinate, newCoordinate: Coordinate) {
-    let movedPiece = this.chessBoard[coordinate.i][coordinate.j].piece;
+  // private onKeyClickCallback(e: Event) {
+  //   if (this.selectedPiece) {
+  //     this.selectedPiece = null;
+  //   }
+  // }
 
-    if (this.chessBoard[newCoordinate.i][newCoordinate.j].piece) {
-      this.removePiecefromPoint(newCoordinate);
+  private removePiecefromPoint(coordinate: Coordinate) {
+    let x = coordinate.x;
+    let y = coordinate.y;
+    let currentSquare = this.chessBoard[x][y];
+
+    if (currentSquare.squareLink.childElementCount) {
+      currentSquare.squareLink.removeChild(currentSquare.squareLink.lastChild);
+    }
+    currentSquare.piece = null;
+  }
+
+  private setPieceOnPoint(piece: Piece, position: Coordinate) {
+    let x = position.x;
+    let y = position.y;
+    let currentSquare = this.chessBoard[x][y];
+
+    this.chessBoard[x][y].piece = piece;
+    if (currentSquare.squareLink.childElementCount) {
+      currentSquare.squareLink.removeChild(currentSquare.squareLink.lastChild);
+    }
+    let pieceInmage = piece.getImage(ChessGame.IMAGE_SIZE);
+    currentSquare.squareLink.appendChild(pieceInmage);
+  }
+
+  private setUpPiecesOnBoard(pieces: Piece[]) {
+    for (let i = 0; i < pieces.length; i++) {
+      let piecePosition = pieces[i].getWPosition();
+      this.setPieceOnPoint(pieces[i], piecePosition);
+    }
+  }
+
+  private onMoveAnalizedEvent(coordinate: Coordinate, newCoordinate: Coordinate) {
+    if (!coordinate) { // Сheckmate
+      // this.onCheckmateEvent();
+      return;
     }
 
+    let movedPiece = this.chessBoard[coordinate.x][coordinate.y].piece;
+    if (this.chessBoard[newCoordinate.x][newCoordinate.y].piece) {
+      this.removePiecefromPoint(newCoordinate);
+    }
     this.setPieceOnPoint(newCoordinate, movedPiece);
     this.removePiecefromPoint(coordinate);
     // this.move();
   }
 
-  private onKeyClickCallback(e: Event) {
-    if (this.selectedPiece) {
-      this.selectedPiece = null;
-    }
-  }
-
-  private move(piece: virtualBoardPoint, coordinate: Coordinate): void {
-
-  }
-
-  private removePieceImgfromSquare(squareLink: HTMLElement) {
-    if (squareLink.childElementCount) {
-      squareLink.removeChild(squareLink.lastChild);
-    }
-  }
-
-  private setUpPieceImgOnSquare(squareLink: HTMLElement, piece: Piece) {
-    if (squareLink.childElementCount) {
-      squareLink.removeChild(squareLink.lastChild);
-    }
-    squareLink.appendChild(piece.getImage(ChessGame.IMAGE_SIZE));
-  }
-
-  private removePiecefromPoint(coordinate: Coordinate) {
-    let currentSquare = this.chessBoard[coordinate.i][coordinate.j];
-    this.removePieceImgfromSquare(currentSquare.squareLink);
-    currentSquare.piece = null;
-  }
-
-  private setPieceOnPoint(coordinate: Coordinate, piece: Piece) {
-    let currentSquare = this.chessBoard[coordinate.i][coordinate.j];
-    this.setUpPieceImgOnSquare(currentSquare.squareLink, piece)
-    currentSquare.piece = piece;
-  }
-
-  private setUpPiecesOnBoard(a: virtualBoardPoint[]) {
-    for (let i = 0; i < a.length; i++) {
-      let currentSquare = this.chessBoard[a[i].coordinate.i][a[i].coordinate.j];
-      this.setPieceOnPoint(a[i].coordinate, a[i].piece);
-    }
-  }
-
-  private getSquareColor(i: number, j: number) {
-    if ((i % 2) != 0) {
-      if ((j % 2) != 0) {
+  private getSquareColor(x: number, y: number) {
+    if ((x % 2) != 0) {
+      if ((y % 2) != 0) {
         return ChessGame.WHITE_SQUARE_COLOR;
       } else {
         return ChessGame.BLACK_SQUARE_COLOR;
       }
     } else {
-      if ((j % 2) == 0) {
+      if ((y % 2) == 0) {
         return ChessGame.WHITE_SQUARE_COLOR;
       } else {
         return ChessGame.BLACK_SQUARE_COLOR;
@@ -156,34 +142,35 @@ export default class ChessGame {
     }
   }
 
-  private createChessBoardElement() {
+  private initializeChessboardElement() {
+    this.chessBoard = [];
     let boardElement = document.createElement("table");
     boardElement.setAttribute("style", "border-collapse:collapse;");
 
     for (let i = 0; i < 8; i++) {
+      this.chessBoard[i] = [];
       let line = document.createElement("tr");
 
-        for (let j = 0; j < 8; j++) {
-            let square = document.createElement("td");
-            square.dataset.i = i.toString();
-            square.dataset.j = j.toString();
-            let color= this.getSquareColor(i, j);;
+      for (let j = 0; j < 8; j++) {
+        let square = document.createElement("td");
 
-            square.style.height = ChessGame.SQUARE_SIZE + "px";
-            square.style.width = ChessGame.SQUARE_SIZE + "px";
-            square.style.background = color;
-            square.style.textAlign = "center";
+        square.dataset.x = i.toString();
+        square.dataset.y = j.toString();
+        square.style.height = ChessGame.SQUARE_SIZE + "px";
+        square.style.width = ChessGame.SQUARE_SIZE + "px";
+        square.style.background = this.getSquareColor(i, j);;
+        square.style.textAlign = "center";
 
-            line.appendChild(square);
-            this.chessBoard[i][j] = {
-              piece: null,
-              squareLink: square,
-            }
+        line.appendChild(square);
+        this.chessBoard[i][j] = {
+          piece: null,
+          squareLink: square,
         }
-        boardElement.appendChild(line);
+      }
+      boardElement.appendChild(line);
     }
 
-    boardElement.addEventListener("click", this.onBoardClickCallback);
+    boardElement.addEventListener("click", this.onBoardClickEvent);
     return boardElement;
   }
 

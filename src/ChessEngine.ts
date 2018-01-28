@@ -54,11 +54,20 @@ export default class ChessEngine {
     return true;
   }
 
-  public analize(): void {
+  private evaluatePosition(): number {
+    let evaluation: number;
+    evaluation = 1;
+
+    return evaluation;
+  }
+
+  public analize(depth: number): void {
     let lastSelectedMove: VirtualMove;
     let avalibleMoves: VirtualMove[] = this.getAvalibleMoves();
 
     for (let i = 0; i < avalibleMoves.length; i++) {
+      this.evaluatePosition();
+
       // TODO: Use alpha–beta pruning
     }
 
