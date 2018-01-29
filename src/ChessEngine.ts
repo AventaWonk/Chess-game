@@ -8,11 +8,9 @@ export default class ChessEngine {
   private virtualChessBoard: VirtualChessboard;
   private onMoveDeterminedEvent: Function;
 
-  constructor(player: number, picesSetup: Piece[], onMoveDeterminedEvent: Function) {
-    this.player = player;
+  constructor(onMoveDeterminedEvent: Function) {
     this.virtualChessBoard = new VirtualChessboard();
-    this.virtualChessBoard.setUpPieces(picesSetup);
-    this.onMoveDeterminedEvent = onMoveDeterminedEvent;
+    this.onMoveDeterminedEvent = onMoveDeterminedEvent.bind(this);
   }
 
   private getAvalibleMoves(): VirtualMove[] {
@@ -87,5 +85,13 @@ export default class ChessEngine {
 
     this.virtualChessBoard.setPiece(movablePiece, newCoordinate.x, newCoordinate.y);
     this.virtualChessBoard.removePiece(newCoordinate.x, newCoordinate.y);
+  }
+
+  public setPlayer(player: number) {
+    this.player = player;
+  }
+
+  public setUpPieces(picesSetup: Piece[]) {
+    this.virtualChessBoard.setUpPieces(picesSetup);
   }
 }
