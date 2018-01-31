@@ -23,9 +23,9 @@ export default class ChessGame {
 
   constructor(player: number) {
     this.player = player;
-    this.initializeChessboardElement();
     this.onBoardClickEvent = this.onBoardClickEvent.bind(this);
     this.onMoveAnalizedEvent = this.onMoveAnalizedEvent.bind(this);
+    this.initializeChessboardElement();
     this.engine = new ChessEngine(this.onMoveAnalizedEvent);
     this.engine.setPlayer(player);
     let pieceSetup = this.getDefaultPieceSetup(player);
@@ -73,21 +73,26 @@ export default class ChessGame {
   //     this.selectedSquare = null;
   //   }
   // }
+
   private getDefaultPieceSetup(player: number): Piece[] {
-    // return [
-    //   new Bishop(0, {
-    //     x: 0,
-    //     y: 0
-    //   }),
-    //   new Bishop(0, {
-    //     x: 1,
-    //     y: 0
-    //   }),
-    //   new Bishop(0, {
-    //     x: 2,
-    //     y: 0
-    //   }),
-    // ];
+    let pieceSetup: Piece[] = [];
+
+    for (let i = 0; i < 8; i++) {
+        pieceSetup.push(
+          new Pawn(this.player, {
+            x: i,
+            y: 1
+          })
+        );
+        pieceSetup.push(
+          new Pawn(1, { // TODO: Change side flags to binary (this.player ^ 1)
+            x: i,
+            y: 6
+          })
+        );
+    }
+
+    return pieceSetup;
   }
 
   private getSquareCoordinate(square: HTMLTableDataCellElement): Coordinate {
@@ -133,7 +138,7 @@ export default class ChessGame {
   private setUpPiecesOnBoard(pieces: Piece[]) {
     this.engine.setUpPieces(pieces);
     for (let i = 0; i < pieces.length; i++) {
-      let piecePosition = pieces[i].getWPosition();
+      let piecePosition = pieces[i].getPosition();
       this.setPieceOnPoint(pieces[i], piecePosition);
     }
   }
@@ -174,31 +179,32 @@ export default class ChessGame {
     let boardElement = document.createElement("table");
     boardElement.setAttribute("style", "border-collapse:collapse;");
 
-    for (let i = 0; i < 8; i++) {
-      this.chessBoard[i] = [];
+    for (let i = 7; i > -1; i--) {
+      // this.chessBoard[i] = [];
+      this.chessBoard.push([]);
       let line = document.createElement("tr");
 
       for (let j = 0; j < 8; j++) {
         let square = document.createElement("td");
 
-        square.dataset.x = i.toString();
-        square.dataset.y = j.toString();
+        square.dataset.x = j.toString();
+        square.dataset.y = i.toString();
         square.style.height = ChessGame.SQUARE_SIZE + "px";
         square.style.width = ChessGame.SQUARE_SIZE + "px";
         square.style.background = this.getSquareColor(i, j);;
         square.style.textAlign = "center";
 
         line.appendChild(square);
-        this.chessBoard[i][j] = {
+        this.chessBoard[this.chessBoard.length - 1].push({
           piece: null,
           squareLink: square,
-        }
+        });
       }
       boardElement.appendChild(line);
     }
 
     boardElement.addEventListener("click", this.onBoardClickEvent);
-    return boardElement;
+    this.chessBoardElement = boardElement;
   }
 
   public getChessBoard() {
