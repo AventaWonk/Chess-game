@@ -27,8 +27,8 @@ export default class virtualChessboard {
   }
 
   public addPiece(piece: Piece): void {
-    let x = piece.getWPosition().x;
-    let y = piece.getWPosition().y;
+    let x = piece.getPosition().x;
+    let y = piece.getPosition().y;
 
     this.chessBoard[x][y] = piece;
   }

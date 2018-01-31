@@ -26,7 +26,7 @@ export default class ChessEngine {
 
       let avaliblePieceMoves = currentPiece.getMoves(); // TODO: validate in getMoves()
       avalibleMoves.push({
-        position: allPieces[i].getWPosition(),
+        position: allPieces[i].getPosition(),
         newPoints: avaliblePieceMoves,
       });
     }

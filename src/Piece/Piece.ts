@@ -40,7 +40,7 @@ export default abstract class Piece {
     this.position = position;
   }
 
-  public getWPosition(): Coordinate {
+  public getPosition(): Coordinate {
     return this.position;
   }
 
