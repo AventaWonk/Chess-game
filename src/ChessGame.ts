@@ -9,8 +9,8 @@ interface BoardPoint {
 }
 
 export default class ChessGame {
-  public static WHTIE = 1;
-  public static BLACK = 2;
+  public static WHTIE = 0;
+  public static BLACK = 1;
   private static SQUARE_SIZE = "60";
   private static IMAGE_SIZE = "40";
   private static WHITE_SQUARE_COLOR = "#ffccb3";
@@ -41,30 +41,26 @@ export default class ChessGame {
       return;
     }
 
-    let selectedSquareCoordinate = this.getSquareCoordinate(target as HTMLTableDataCellElement);
-    let currentBoardPoint = this.chessBoard[selectedSquareCoordinate.x][selectedSquareCoordinate.y];
+    let currentSquareCoordinate = this.getSquareCoordinate(target as HTMLTableDataCellElement);
+    let currentBoardPoint = this.chessBoard[currentSquareCoordinate.x][currentSquareCoordinate.y];
 
     if (this.selectedSquare) { // move
-      // let selected = this.chessBoard[this.selectedSquare.coordinate.i][this.selectedSquare.coordinate.j];
       if (currentBoardPoint.piece && this.selectedSquare.piece.getSide() == currentBoardPoint.piece.getSide()) { // @TODO check castling
+        this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement);
+        this.selectedSquare = null;
         return;
       }
 
       let oldPoint = this.getSquareCoordinate(this.selectedSquare.squareLink as HTMLTableDataCellElement);
-      this.engine.move(oldPoint, selectedSquareCoordinate);
-      this.removePiecefromPoint(oldPoint);
-      this.setPieceOnPoint(this.selectedSquare.piece, selectedSquareCoordinate);
-      // this.engine.move(this.selectedSquare.coordinate, coordinate);
-      this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement)
+      // this.engine.move(oldPoint, currentSquareCoordinate);
+      this.setPieceOnPoint(this.selectedSquare.piece, currentSquareCoordinate);
+      this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement);
       this.selectedSquare = null;
-      this.engine.analize(1);
+      this.removePiecefromPoint(oldPoint);
+      // this.engine.analize(1);
     } else if (currentBoardPoint.piece) { // select piece
       this.highlightSquare(target as HTMLTableDataCellElement);
-      // this.selectedSquare = {
-      //   piece: current.piece,
-      //   coordinate: coordinate,
-      // }
-      // current.squareLink.style.background = "#ffcaa1";
+      this.selectedSquare = currentBoardPoint;
     }
   }
 
@@ -85,7 +81,7 @@ export default class ChessGame {
           })
         );
         pieceSetup.push(
-          new Pawn(1, { // TODO: Change side flags to binary (this.player ^ 1)
+          new Pawn(this.player ^ 1, { // TODO: Change side flags to binary (this.player ^ 1)
             x: i,
             y: 6
           })
@@ -131,8 +127,8 @@ export default class ChessGame {
     if (currentBoardPoint.squareLink.childElementCount) {
       currentBoardPoint.squareLink.removeChild(currentBoardPoint.squareLink.lastChild);
     }
-    let pieceInmage = piece.getImage(ChessGame.IMAGE_SIZE);
-    currentBoardPoint.squareLink.appendChild(pieceInmage);
+    let pieceImage = piece.getImage(ChessGame.IMAGE_SIZE);
+    currentBoardPoint.squareLink.appendChild(pieceImage);
   }
 
   private setUpPiecesOnBoard(pieces: Piece[]) {
@@ -168,15 +164,13 @@ export default class ChessGame {
 
   private initializeChessboardElement() {
     this.chessBoard = [];
-    let boardElement = document.createElement("table");
-    boardElement.setAttribute("style", "border-collapse:collapse;");
     for (let i = 0; i < 8; i++) {
         this.chessBoard.push(new Array(8));
     }
+    let boardElement = document.createElement("table");
+    boardElement.setAttribute("style", "border-collapse:collapse;");
 
     for (let i = 7; i > -1; i--) {
-      // this.chessBoard[i] = [];
-      // this.chessBoard.push(new Array(8));
       let line = document.createElement("tr");
 
       for (let j = 0; j < 8; j++) {

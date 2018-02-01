@@ -1,3 +1,4 @@
+import ChessGame from '../ChessGame';
 import {Coordinate} from '../Types/Coordinate';
 
 export default abstract class Piece {
@@ -18,7 +19,7 @@ export default abstract class Piece {
   public getImage(imageSize: string): HTMLImageElement {
     let img = document.createElement("img");
 
-    if (this.side == 1) {
+    if (this.side == ChessGame.WHTIE) {
       img.src = this.whiteImageLink;
     } else {
       img.src = this.blackImageLink;
