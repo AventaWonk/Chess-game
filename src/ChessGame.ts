@@ -125,14 +125,14 @@ export default class ChessGame {
   private setPieceOnPoint(piece: Piece, position: Coordinate) {
     let x = position.x;
     let y = position.y;
-    let currentSquare = this.chessBoard[x][y];
+    let currentBoardPoint = this.chessBoard[x][y];
 
-    this.chessBoard[x][y].piece = piece;
-    if (currentSquare.squareLink.childElementCount) {
-      currentSquare.squareLink.removeChild(currentSquare.squareLink.lastChild);
+    currentBoardPoint.piece = piece;
+    if (currentBoardPoint.squareLink.childElementCount) {
+      currentBoardPoint.squareLink.removeChild(currentBoardPoint.squareLink.lastChild);
     }
     let pieceInmage = piece.getImage(ChessGame.IMAGE_SIZE);
-    currentSquare.squareLink.appendChild(pieceInmage);
+    currentBoardPoint.squareLink.appendChild(pieceInmage);
   }
 
   private setUpPiecesOnBoard(pieces: Piece[]) {
@@ -159,29 +159,24 @@ export default class ChessGame {
   }
 
   private getSquareColor(x: number, y: number) {
-    if ((x % 2) != 0) {
-      if ((y % 2) != 0) {
-        return ChessGame.WHITE_SQUARE_COLOR;
-      } else {
-        return ChessGame.BLACK_SQUARE_COLOR;
-      }
-    } else {
-      if ((y % 2) == 0) {
-        return ChessGame.WHITE_SQUARE_COLOR;
-      } else {
-        return ChessGame.BLACK_SQUARE_COLOR;
-      }
+    if ((x + 1) % 2 !== (y + 1) % 2) {
+      return ChessGame.WHITE_SQUARE_COLOR;
     }
+
+    return ChessGame.BLACK_SQUARE_COLOR;
   }
 
   private initializeChessboardElement() {
     this.chessBoard = [];
     let boardElement = document.createElement("table");
     boardElement.setAttribute("style", "border-collapse:collapse;");
+    for (let i = 0; i < 8; i++) {
+        this.chessBoard.push(new Array(8));
+    }
 
     for (let i = 7; i > -1; i--) {
       // this.chessBoard[i] = [];
-      this.chessBoard.push([]);
+      // this.chessBoard.push(new Array(8));
       let line = document.createElement("tr");
 
       for (let j = 0; j < 8; j++) {
@@ -195,10 +190,10 @@ export default class ChessGame {
         square.style.textAlign = "center";
 
         line.appendChild(square);
-        this.chessBoard[this.chessBoard.length - 1].push({
+        this.chessBoard[j][i] = {
           piece: null,
           squareLink: square,
-        });
+        };
       }
       boardElement.appendChild(line);
     }
