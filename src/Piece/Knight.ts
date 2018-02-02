@@ -7,6 +7,7 @@ export default class Knight extends Piece {
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteKnight.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackKnight.png";
+    this.notationIdentifier = 'K';
   }
 
   public getMoves() {
@@ -46,5 +47,9 @@ export default class Knight extends Piece {
     });
 
     return this.getValidMoves(moves);
+  }
+
+  public getNotationIdentifer(): String {
+    return "N";
   }
 }

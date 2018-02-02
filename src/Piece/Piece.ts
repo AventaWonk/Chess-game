@@ -7,7 +7,7 @@ export default abstract class Piece {
   protected position: Coordinate;
   protected weight: number = 0;
   protected side: number;
-
+  protected notationIdentifier: String;
 
   constructor(side: number, position: Coordinate) {
     this.side = side;
@@ -43,6 +43,10 @@ export default abstract class Piece {
 
   public getPosition(): Coordinate {
     return this.position;
+  }
+
+  public getNotationIdentifer(): String {
+    return this.notationIdentifier;
   }
 
   protected isOutOfBoard(point: Coordinate): boolean {

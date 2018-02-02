@@ -7,6 +7,7 @@ export default class Bishop extends Piece {
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteBishop.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackBishop.png";
+    this.notationIdentifier = 'B';
   }
 
   public getMoves() {

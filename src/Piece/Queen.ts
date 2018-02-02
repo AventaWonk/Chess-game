@@ -7,6 +7,7 @@ export default class Queen extends Piece {
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteQueen.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackQueen.png";
+    this.notationIdentifier = 'Q';
   }
 
   public getMoves() {

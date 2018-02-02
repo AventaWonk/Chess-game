@@ -18,13 +18,22 @@ export default class ChessGame {
   private player: number;
   private selectedSquare: BoardPoint = null;
   private chessBoard: BoardPoint[][];
+  private notationLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+  private movesHistory: String[];
   private chessBoardElement: HTMLElement;
   private engine: ChessEngine;
 
   constructor(player: number) {
     this.player = player;
+    this.movesHistory = [];
+    this.chessBoard = [];
+    for (let i = 0; i < 8; i++) {
+        this.chessBoard.push(new Array(8));
+    }
+
     this.onBoardClickEvent = this.onBoardClickEvent.bind(this);
     this.onMoveAnalizedEvent = this.onMoveAnalizedEvent.bind(this);
+
     this.initializeChessboardElement();
     this.engine = new ChessEngine(this.onMoveAnalizedEvent);
     this.engine.setPlayer(player);
@@ -45,11 +54,23 @@ export default class ChessGame {
     let currentBoardPoint = this.chessBoard[currentSquareCoordinate.x][currentSquareCoordinate.y];
 
     if (this.selectedSquare) { // move
+      let moveNotation = "";
+      let captureNotation = "";
+
       if (currentBoardPoint.piece && this.selectedSquare.piece.getSide() == currentBoardPoint.piece.getSide()) { // @TODO check castling
         this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement);
+        moveNotation = "0-0"; // or "0-0-0"
+        this.movesHistory.push(moveNotation);
         this.selectedSquare = null;
         return;
       }
+
+      if (currentBoardPoint.piece) { // capture
+        captureNotation = "x";
+      }
+
+      moveNotation = this.selectedSquare.piece.getNotationIdentifer() + captureNotation + this.notationLetters[currentSquareCoordinate.x] + (currentSquareCoordinate.y + 1);
+      this.movesHistory.push(moveNotation);
 
       let oldPoint = this.getSquareCoordinate(this.selectedSquare.squareLink as HTMLTableDataCellElement);
       // this.engine.move(oldPoint, currentSquareCoordinate);
@@ -163,15 +184,14 @@ export default class ChessGame {
   }
 
   private initializeChessboardElement() {
-    this.chessBoard = [];
-    for (let i = 0; i < 8; i++) {
-        this.chessBoard.push(new Array(8));
-    }
     let boardElement = document.createElement("table");
     boardElement.setAttribute("style", "border-collapse:collapse;");
 
     for (let i = 7; i > -1; i--) {
-      let line = document.createElement("tr");
+      let row = document.createElement("tr");
+      let rowNumber = document.createElement("td");
+      rowNumber.insertAdjacentText('afterbegin', (i + 1).toString());
+      row.appendChild(rowNumber);
 
       for (let j = 0; j < 8; j++) {
         let square = document.createElement("td");
@@ -183,14 +203,24 @@ export default class ChessGame {
         square.style.background = this.getSquareColor(i, j);;
         square.style.textAlign = "center";
 
-        line.appendChild(square);
+        row.appendChild(square);
         this.chessBoard[j][i] = {
           piece: null,
           squareLink: square,
         };
       }
-      boardElement.appendChild(line);
+      boardElement.appendChild(row);
     }
+
+    let row = document.createElement("tr");
+    let columnLetter = document.createElement("td");
+    row.appendChild(columnLetter);
+    for (let i = 0; i < 8; i++) {
+      columnLetter = document.createElement("td");
+      columnLetter.insertAdjacentText('afterbegin', this.notationLetters[i].toString());
+      row.appendChild(columnLetter);
+    }
+    boardElement.appendChild(row);
 
     boardElement.addEventListener("click", this.onBoardClickEvent);
     this.chessBoardElement = boardElement;

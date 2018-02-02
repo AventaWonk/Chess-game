@@ -7,6 +7,7 @@ export default class King extends Piece {
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteKing.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackKing.png";
+    this.notationIdentifier = 'K';
   }
 
   public getMoves() {

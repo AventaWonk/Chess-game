@@ -7,6 +7,7 @@ export default class Rook extends Piece {
     this.weight = 1;
     this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteRook.png";
     this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackRook.png";
+    this.notationIdentifier = 'R';
   }
 
   public getMoves() {
