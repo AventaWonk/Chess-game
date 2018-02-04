@@ -2,48 +2,54 @@ import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
 export default class Knight extends Piece {
-  constructor(side: number, position: Coordinate) {
-    super(side, position);
-    this.weight = 1;
-    this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteKnight.png";
-    this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackKnight.png";
-    this.notationIdentifier = 'K';
+
+  getWhiteImage() {
+    return "https://marcelk.net/chess/pieces/cburnett/80/WhiteKnight.png";
+  }
+
+  getBlackImage() {
+    return "https://marcelk.net/chess/pieces/cburnett/80/BlackKnight.png";
+  }
+
+  getWeight() {
+    return 1;
   }
 
   public getMoves() {
     let moves: Coordinate[] = [];
+    let currentPosition = this.getPosition();
 
     moves.push({
-      x: this.position.x + 2,
-      y: this.position.y + 1,
+      x: currentPosition.x + 2,
+      y: currentPosition.y + 1,
     });
     moves.push({
-      x: this.position.x + 2,
-      y: this.position.y - 1,
+      x: currentPosition.x + 2,
+      y: currentPosition.y - 1,
     });
     moves.push({
-      x: this.position.x + 1,
-      y: this.position.y + 2,
+      x: currentPosition.x + 1,
+      y: currentPosition.y + 2,
     });
     moves.push({
-      x: this.position.x + 1,
-      y: this.position.y - 2,
+      x: currentPosition.x + 1,
+      y: currentPosition.y - 2,
     });
     moves.push({
-      x: this.position.x - 2,
-      y: this.position.y + 1,
+      x: currentPosition.x - 2,
+      y: currentPosition.y + 1,
     });
     moves.push({
-      x: this.position.x - 2,
-      y: this.position.y - 1 ,
+      x: currentPosition.x - 2,
+      y: currentPosition.y - 1 ,
     });
     moves.push({
-      x: this.position.x - 1,
-      y: this.position.y + 2,
+      x: currentPosition.x - 1,
+      y: currentPosition.y + 2,
     });
     moves.push({
-      x: this.position.x - 1,
-      y: this.position.y - 2,
+      x: currentPosition.x - 1,
+      y: currentPosition.y - 2,
     });
 
     return this.getValidMoves(moves);

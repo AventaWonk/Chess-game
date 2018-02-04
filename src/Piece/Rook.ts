@@ -2,27 +2,33 @@ import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
 export default class Rook extends Piece {
-  constructor(side: number, position: Coordinate) {
-    super(side, position);
-    this.weight = 1;
-    this.whiteImageLink = "https://marcelk.net/chess/pieces/cburnett/80/WhiteRook.png";
-    this.blackImageLink = "https://marcelk.net/chess/pieces/cburnett/80/BlackRook.png";
-    this.notationIdentifier = 'R';
+
+  getWhiteImage() {
+    return "https://marcelk.net/chess/pieces/cburnett/80/WhiteRook.png";
+  }
+
+  getBlackImage() {
+    return "https://marcelk.net/chess/pieces/cburnett/80/BlackRook.png";
+  }
+
+  getWeight() {
+    return 1;
   }
 
   public getMoves() {
     let moves: Coordinate[] = [];
+    let currentPosition = this.getPosition();
 
     for (let x = 0; x < 8; x++) {
-      if (x != this.position.x) {
+      if (x != currentPosition.x) {
         moves.push({
           x: x,
-          y: this.position.y
+          y: currentPosition.y
         });
       }
-      if (x != this.position.y) {
+      if (x != currentPosition.y) {
         moves.push({
-          x: this.position.x,
+          x: currentPosition.x,
           y: x
         });
       }
