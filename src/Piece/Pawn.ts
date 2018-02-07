@@ -3,8 +3,9 @@ import {Coordinate} from '../Types/Coordinate';
 import Piece from "./Piece";
 
 export default class Pawn extends Piece {
+  private isFirstMove: boolean = true;
 
-  getWhiteImage() {
+   getWhiteImage() {
     return "https://marcelk.net/chess/pieces/cburnett/80/WhitePawn.png";
   }
 
@@ -27,13 +28,15 @@ export default class Pawn extends Piece {
       l = -1;
     }
 
-    moves.push({
-      x: currentPosition.x + l,
-      y: currentPosition.y,
-    });
+    let piece = this.getVirtualChessboardLink().getPiece(currentPosition.x, currentPosition.y + l);
+    if (!piece) {
+      moves.push({
+        x: currentPosition.x,
+        y: currentPosition.y + l,
+      });
+    }
 
-    let piece = this.getVirtualChessboardLink().getPiece(currentPosition.x + l, currentPosition.y + l);
-
+    piece = this.getVirtualChessboardLink().getPiece(currentPosition.x + 1, currentPosition.y + l);
     if (piece && piece.getSide() != this.getSide()) {
       moves.push({
         x: currentPosition.x + 1,
@@ -41,8 +44,7 @@ export default class Pawn extends Piece {
       });
     }
 
-    piece = this.getVirtualChessboardLink().getPiece(currentPosition.x - l, currentPosition.y + l);
-
+    piece = this.getVirtualChessboardLink().getPiece(currentPosition.x - 1, currentPosition.y + l);
     if (piece && piece.getSide() != this.getSide()) {
       moves.push({
         x: currentPosition.x - 1,
@@ -50,9 +52,17 @@ export default class Pawn extends Piece {
       });
     }
 
-    if (true) { // "En passant" flag
-
+    if (this.isFirstMove) {
+      moves.push({
+        x: currentPosition.x,
+        y: currentPosition.y + 2 * l,
+      });
+      delete this.isFirstMove;
     }
+
+    // if (true) { // "En passant" flag
+    //
+    // }
 
     return moves;
   }
