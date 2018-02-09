@@ -2,10 +2,12 @@ import ChessEngine from './ChessEngine';
 import {Coordinate} from './Types/Coordinate';
 import Piece from './Piece/Piece';
 import Pawn from './Piece/Pawn';
+import Bishop from './Piece/Bishop';
+import Rook from './Piece/Rook';
 
 interface BoardPoint {
   piece: Piece;
-  squareLink: HTMLElement;
+  squareLink: HTMLTableDataCellElement;
 }
 
 export default class ChessGame {
@@ -15,6 +17,7 @@ export default class ChessGame {
   private static IMAGE_SIZE = "40";
   private static WHITE_SQUARE_COLOR = "#ffccb3";
   private static BLACK_SQUARE_COLOR = "#af6744";
+  private static HIGHLIGHTED_SQUARE_COLOR = "#8a7e78";
   private player: number;
   private selectedSquare: BoardPoint = null;
   private chessBoard: BoardPoint[][];
@@ -22,6 +25,7 @@ export default class ChessGame {
   private movesHistory: String[];
   private chessBoardElement: HTMLElement;
   private engine: ChessEngine;
+  private highlightedSquares: HTMLTableDataCellElement[] = [];
 
   constructor(player: number) {
     this.player = player;
@@ -53,19 +57,31 @@ export default class ChessGame {
     let currentSquareCoordinate = this.getSquareCoordinate(target as HTMLTableDataCellElement);
     let currentBoardPoint = this.chessBoard[currentSquareCoordinate.x][currentSquareCoordinate.y];
 
-    if (this.selectedSquare) { // move
+    if (this.selectedSquare) {
+      // move
+
+      if (!target.dataset.isAvailable) {
+        return
+      }
+
+      for (let i = 0; i < this.highlightedSquares.length; i++) {
+        this.unhighlightSquare(this.highlightedSquares[i]);
+      }
+
+      this.highlightedSquares = []
       let moveNotation = "";
       let captureNotation = "";
 
       if (currentBoardPoint.piece && this.selectedSquare.piece.getSide() == currentBoardPoint.piece.getSide()) { // @TODO check castling
         this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement);
-        moveNotation = "0-0"; // or "0-0-0"
+        moveNotation = "0-0"; // @TODO or "0-0-0"
         this.movesHistory.push(moveNotation);
         this.selectedSquare = null;
         return;
       }
 
-      if (currentBoardPoint.piece) { // capture
+      if (currentBoardPoint.piece) {
+        // capture
         captureNotation = "x";
       }
 
@@ -73,15 +89,24 @@ export default class ChessGame {
       this.movesHistory.push(moveNotation);
 
       let oldPoint = this.getSquareCoordinate(this.selectedSquare.squareLink as HTMLTableDataCellElement);
-      // this.engine.move(oldPoint, currentSquareCoordinate);
+      this.engine.move(oldPoint, currentSquareCoordinate);
       this.setPieceOnPoint(this.selectedSquare.piece, currentSquareCoordinate);
       this.unhighlightSquare(this.selectedSquare.squareLink as HTMLTableDataCellElement);
       this.selectedSquare = null;
       this.removePiecefromPoint(oldPoint);
       // this.engine.analize(1);
-    } else if (currentBoardPoint.piece) { // select piece
+    } else if (currentBoardPoint.piece) {
+      // select piece
       this.highlightSquare(target as HTMLTableDataCellElement);
       this.selectedSquare = currentBoardPoint;
+
+      //highlight avalible squares
+      let availableSquares = currentBoardPoint.piece.getMoves();
+      for (let i = 0; i < availableSquares.length; i++) {
+        let square = this.chessBoard[availableSquares[i].x][availableSquares[i].y].squareLink;
+        this.highlightedSquares.push(square);
+        this.highlightAvailableSquare(square);
+      }
     }
   }
 
@@ -92,21 +117,31 @@ export default class ChessGame {
   // }
 
   private getDefaultPieceSetup(player: number): Piece[] {
-    let pieceSetup: Piece[] = [];
+    let vcb = this.engine.getVirtualChessboardLink();
+    let pieceSetup: Piece[] = [
+      new Rook(this.player, {
+        x: 0,
+        y: 0
+      }, vcb),
+      new Bishop(this.player, {
+        x: 2,
+        y: 0
+      }, vcb)
+    ];
 
     for (let i = 0; i < 8; i++) {
-        pieceSetup.push(
-          new Pawn(this.player, {
-            x: i,
-            y: 1
-          })
-        );
-        pieceSetup.push(
-          new Pawn(this.player ^ 1, { // TODO: Change side flags to binary (this.player ^ 1)
-            x: i,
-            y: 6
-          })
-        );
+      pieceSetup.push(
+        new Pawn(this.player, {
+          x: i,
+          y: 1
+        }, vcb)
+      );
+      pieceSetup.push(
+        new Pawn(this.player ^ 1, { // TODO: Change side flags to binary (this.player ^ 1)
+          x: i,
+          y: 6
+        }, vcb)
+      );
     }
 
     return pieceSetup;
@@ -119,13 +154,19 @@ export default class ChessGame {
     };
   }
 
+  private highlightAvailableSquare(square: HTMLTableDataCellElement): void {
+    square.dataset.isAvailable = "1";
+    square.style.background = ChessGame.HIGHLIGHTED_SQUARE_COLOR;
+  }
+
   private highlightSquare(square: HTMLTableDataCellElement): void {
-    square.style.background = "#ffcaa1";
+    square.style.background = ChessGame.HIGHLIGHTED_SQUARE_COLOR;
   }
 
   private unhighlightSquare(square: HTMLTableDataCellElement) {
     let squareCoordinate = this.getSquareCoordinate(square);
     square.style.background = this.getSquareColor(squareCoordinate.x, squareCoordinate.y);
+    delete square.dataset.isAvailable;
   }
 
   private removePiecefromPoint(coordinate: Coordinate): void {
