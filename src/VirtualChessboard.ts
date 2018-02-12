@@ -15,6 +15,10 @@ export default class virtualChessboard {
   }
 
   public getPiece(x: number, y: number): Piece {
+    if (x > 7 || x < 0 || y > 7 || y < 0) {
+      return null;
+    }
+
     return this.chessBoard[x][y];
   }
 
@@ -37,12 +41,32 @@ export default class virtualChessboard {
     this.chessBoard[x][y] = null;
   }
 
+  public movePiece(piece: Piece, newPoint: Coordinate): void {
+    this.setPiece(piece, newPoint.x, newPoint.y);
+    this.removePiece(newPoint.x, newPoint.y);
+    piece.setFirstMoveAsIsDone();
+  }
+
   public getAllPieces(): Piece[] {
     let allPieces: Piece[] = [];
 
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (this.chessBoard[i][j]) {
+          allPieces.push(this.chessBoard[i][j]);
+        }
+      }
+    }
+
+    return allPieces;
+  }
+
+  public getAllPiecesBySide(side: number): Piece[] {
+    let allPieces: Piece[] = [];
+
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (this.chessBoard[i][j] && this.chessBoard[i][j].getSide() == side) {
           allPieces.push(this.chessBoard[i][j]);
         }
       }
