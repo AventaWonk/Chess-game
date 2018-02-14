@@ -1,20 +1,20 @@
-import Piece from './Piece/Piece';
+import {AbstractPiece} from './Piece';
 import {Coordinate} from './Types/Coordinate';
 
-export default class virtualChessboard {
-  private chessBoard: Piece[][];
+export default class VirtualChessboard {
+  private chessBoard: AbstractPiece[][];
 
   constructor () {
     this.initializeChessBoard();
   }
 
-  public setUpPieces(piecesSetUp: Piece[]): void {
+  public setUpPieces(piecesSetUp: AbstractPiece[]): void {
     for (let i = 0; i < piecesSetUp.length; i++) {
       this.addPiece(piecesSetUp[i])
     }
   }
 
-  public getPiece(x: number, y: number): Piece {
+  public getPiece(x: number, y: number): AbstractPiece {
     if (x > 7 || x < 0 || y > 7 || y < 0) {
       return null;
     }
@@ -22,7 +22,7 @@ export default class virtualChessboard {
     return this.chessBoard[x][y];
   }
 
-  public setPiece(piece: Piece, x: number, y: number): void {
+  public setPiece(piece: AbstractPiece, x: number, y: number): void {
     this.chessBoard[x][y] = piece;
     this.chessBoard[x][y].updatePosition({
       x: x,
@@ -30,7 +30,7 @@ export default class virtualChessboard {
     });
   }
 
-  public addPiece(piece: Piece): void {
+  public addPiece(piece: AbstractPiece): void {
     let x = piece.getPosition().x;
     let y = piece.getPosition().y;
 
@@ -41,14 +41,14 @@ export default class virtualChessboard {
     this.chessBoard[x][y] = null;
   }
 
-  public movePiece(piece: Piece, newPoint: Coordinate): void {
+  public movePiece(piece: AbstractPiece, newPoint: Coordinate): void {
     this.setPiece(piece, newPoint.x, newPoint.y);
     this.removePiece(newPoint.x, newPoint.y);
     piece.setFirstMoveAsIsDone();
   }
 
-  public getAllPieces(): Piece[] {
-    let allPieces: Piece[] = [];
+  public getAllPieces(): AbstractPiece[] {
+    let allPieces: AbstractPiece[] = [];
 
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -61,8 +61,8 @@ export default class virtualChessboard {
     return allPieces;
   }
 
-  public getAllPiecesBySide(side: number): Piece[] {
-    let allPieces: Piece[] = [];
+  public getAllPiecesBySide(side: number): AbstractPiece[] {
+    let allPieces: AbstractPiece[] = [];
 
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
@@ -85,5 +85,38 @@ export default class virtualChessboard {
         this.chessBoard[i][j] = null;
       }
     }
+  }
+
+  public serialize(): number[] {
+    let array = [];
+
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (!this.chessBoard[i][j]) {
+          array.push(null);
+          continue;
+        }
+
+        array.push(this.chessBoard[i][j].serialize());
+      }
+    }
+
+    return array;
+  }
+
+  public static unserialize(array: number[]): any {
+    let vcb = new VirtualChessboard();
+
+    for (let i = 0; i < 64; i++) {
+      let x = Math.floor(i / 8) + 1;
+      let y = 8 - 8 * x + i;
+
+      if (array[i]) {
+        let piece = AbstractPiece.unserialize(array[i]);
+        vcb.setPiece(piece, x - 1, y)
+      }
+    }
+
+    return vcb;
   }
 }
