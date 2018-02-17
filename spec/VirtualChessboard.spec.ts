@@ -1,6 +1,5 @@
 import {Coordinate} from '../src/Types/Coordinate';
-import Piece from '../src/Piece/Piece';
-import Bishop from '../src/Piece/Bishop';
+import {Bishop, King, Knight, Pawn, Queen, Rook} from '../src/Piece';
 import VirtualChessboard from '../src/VirtualChessboard';
 
 describe("Virtual chessboard class test", () => {
@@ -21,7 +20,6 @@ describe("Virtual chessboard class test", () => {
 
     expect(vcb.getPiece(0, 0)).toEqual(null);
   });
-
   it("checks setUpPieces method", () => {
     let bishop1 = new Bishop(0, {
       x: 1,
@@ -31,7 +29,7 @@ describe("Virtual chessboard class test", () => {
       x: 2,
       y: 2
     });
-    let piecesSetUp: Piece[] = [
+    let piecesSetUp = [
       bishop1,
       bishop2
     ];
@@ -50,7 +48,7 @@ describe("Virtual chessboard class test", () => {
       x: 2,
       y: 2
     });
-    let piecesSetUp: Piece[] = [
+    let piecesSetUp = [
       bishop1,
       bishop2
     ];
@@ -60,6 +58,13 @@ describe("Virtual chessboard class test", () => {
       bishop1,
       bishop2
     ]);
+  });
+
+  it("checks serialize and unserialize methods", () => {
+    let serializedBoard = vcb.serialize();
+    let unserializedBoard = VirtualChessboard.unserialize(serializedBoard);
+
+    expect(unserializedBoard.getAllPieces()).toEqual(vcb.getAllPieces());
   });
 
 });
