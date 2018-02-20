@@ -26,7 +26,6 @@ export abstract class AbstractPiece {
     let piceCode = byte.substr(3, 3);
     let piece;
 
-
     switch (piceCode) {
       case "001":
         piece = new Pawn(side, {x: 0, y: 0});
@@ -116,7 +115,7 @@ export class Pawn extends AbstractPiece {
   }
 
   getWeight() {
-    return 10;
+    return 50;
   }
 
   getCode() {
@@ -184,7 +183,7 @@ export class Bishop extends AbstractPiece {
   }
 
   getWeight() {
-    return 60;
+    return 300;
   }
 
   getCode() {
@@ -274,7 +273,7 @@ export class King extends AbstractPiece {
   }
 
   getWeight() {
-    return 1;
+    return 10000;
   }
 
   getCode() {

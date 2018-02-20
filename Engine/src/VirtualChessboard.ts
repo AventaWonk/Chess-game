@@ -42,8 +42,10 @@ export default class VirtualChessboard {
   }
 
   public movePiece(piece: AbstractPiece, newPoint: Coordinate): void {
+    let oldX = piece.getPosition().x;
+    let oldY = piece.getPosition().y;
     this.setPiece(piece, newPoint.x, newPoint.y);
-    this.removePiece(newPoint.x, newPoint.y);
+    this.removePiece(oldX, oldY);
     piece.setFirstMoveAsIsDone();
   }
 
@@ -104,7 +106,7 @@ export default class VirtualChessboard {
     return array;
   }
 
-  public static unserialize(array: number[]): any {
+  public static unserialize(array: number[]): VirtualChessboard {
     let vcb = new VirtualChessboard();
 
     for (let i = 0; i < 64; i++) {
