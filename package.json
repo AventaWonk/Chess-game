@@ -5,7 +5,11 @@
   "main": "index.js",
   "dependencies": {
     "@types/jasmine": "^2.6.0",
-    "jasmine": "^2.7.0"
+    "@types/react": "^16.0.38",
+    "@types/react-dom": "^16.0.4",
+    "jasmine": "^2.7.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
   },
   "scripts": {
     "test": "jasmine-ts",
