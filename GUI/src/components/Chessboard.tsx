@@ -74,7 +74,17 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     }
   }
 
-  private getSquareColor(x: number, y: number): string {
+  doMove(from: Point, to: Point) {
+    let newChessboardState: any = {};
+    newChessboardState[to.x][to.y] = newChessboardState[from.x][from.y];
+    newChessboardState[from.x][from.y] = null;
+
+    this.setState({
+      chessBoard: newChessboardState,
+    });
+  }
+
+  getSquareColor(x: number, y: number): string {
     if (x % 2 != y % 2) {
       return this.whiteSquareColor;
     }
