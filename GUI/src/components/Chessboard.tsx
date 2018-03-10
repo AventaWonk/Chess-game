@@ -1,9 +1,7 @@
 import * as React from "react";
-import {size, color, playerId, NOTATION_LETTERS} from '../defaults'
 import Square from './Square';
-// import {Point, BoardPoint} from '../types/Coordinate';
-// import {Move} from '../types/Move';
-// import {AbstractPiece, Bishop, King, Knight, Pawn, Queen, Rook} from '../types/Piece';
+import {size, color, playerId, NOTATION_LETTERS} from '../../../Constants/defaults';
+
 
 export interface ChessboardProps {
   side: number;

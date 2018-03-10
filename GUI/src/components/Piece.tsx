@@ -1,6 +1,6 @@
 import * as React from "react";
-import {size, color} from '../defaults'
-import {Point} from '../types/Point';
+import {size, color} from '../../../Constants/defaults';
+import {Point} from '../../../Interfaces/Point';
 // import {AbstractPiece, Bishop, King, Knight, Pawn, Queen, Rook} from '../types/Piece';
 
 export interface PieceProps {
@@ -22,6 +22,7 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
     this.setState({
       isSelected: true,
     });
+    // select piece
   }
 
   render() {
@@ -29,7 +30,7 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
 
     }
     if (this.state.isSelected) {
-      
+
     }
 
     return (

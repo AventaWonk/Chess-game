@@ -1,14 +1,13 @@
 import * as React from "react";
-import {size, color} from '../defaults'
-import {Point} from '../types/Point';
-// import {AbstractPiece, Bishop, King, Knight, Pawn, Queen, Rook} from '../types/Piece';
+import {size, color} from '../../../Constants/defaults';
+import {Point} from '../../../Interfaces/Point';
 
 export interface SquareProps {
-  // position: Point,
-  x: number,
-  y: number,
-  color: string,
-  size: number,
+  x: number;
+  y: number;
+  color: string;
+  size: number;
+  isPieceSelected: boolean;
 }
 
 interface SquareState {
@@ -16,16 +15,24 @@ interface SquareState {
 }
 
 export default class Square extends React.Component<SquareProps, SquareState> {
-  // public position;
-  public color: string;
-  public size: number;
 
-  constructor(props: Square) {
+  constructor(props: SquareProps) {
     super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    if (this.props.isPieceSelected) {
+      // do move
+      let to: Point = {
+        x: this.props.x,
+        y: this.props.y,
+      }
+      this.props.doMove(from, to);
+    }
   }
 
   render() {
-    let image = "";
     let style = {
       background: this.props.color,
       height: this.props.size + "px",
@@ -34,7 +41,7 @@ export default class Square extends React.Component<SquareProps, SquareState> {
 
     return (
       <td style={style} >
-        {image}
+        {this.props.children}
       </td>
     );
   }
