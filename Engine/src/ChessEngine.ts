@@ -1,7 +1,7 @@
-import {Coordinate} from './Types/Coordinate';
-import {Move, AvalibleMoves, EvaluatedMove} from './Types/Move';
-import VirtualChessboard from './VirtualChessboard';
+import {Point}  from '../../Interfaces/Point';
+import {Move, AvalibleMoves} from '../../Interfaces/Move';
 import {AbstractPiece} from './Piece';
+import VirtualChessboard from './VirtualChessboard';
 
 interface Brunch {
   vcb: number[];
@@ -45,7 +45,7 @@ export default class ChessEngine {
     return avalibleMoves;
   }
 
-  private evaluateMove(virtualChessboard: VirtualChessboard, oldCoordinate: Coordinate, newCoordinate: Coordinate): number {
+  private evaluateMove(virtualChessboard: VirtualChessboard, oldCoordinate:Point, newCoordinate:Point): number {
     let evaluation: number = 0;
     let currentPiece = virtualChessboard.getPiece(oldCoordinate.x, oldCoordinate.y);
     let pieceOnTargetSquare = virtualChessboard.getPiece(newCoordinate.x, newCoordinate.y);
@@ -210,7 +210,7 @@ export default class ChessEngine {
     return this.virtualChessBoard;
   }
 
-  // private validateMove(oldCoordinate: Coordinate, newCoordinate: Coordinate): boolean {
+  // private validateMove(oldCoordinate:Point, newCoordinate:Point): boolean {
   //   let movablePiece = this.virtualChessBoard.getPiece(oldCoordinate.x, oldCoordinate.y);
   //
   //   if (!movablePiece) {

@@ -1,5 +1,5 @@
+import {Point} from '../../Interfaces/Point';
 import {AbstractPiece} from './Piece';
-import {Coordinate} from './Types/Coordinate';
 
 export default class VirtualChessboard {
   private chessBoard: AbstractPiece[][];
@@ -41,7 +41,7 @@ export default class VirtualChessboard {
     this.chessBoard[x][y] = null;
   }
 
-  public movePiece(piece: AbstractPiece, newPoint: Coordinate): void {
+  public movePiece(piece: AbstractPiece, newPoint: Point): void {
     let oldX = piece.getPosition().x;
     let oldY = piece.getPosition().y;
     this.setPiece(piece, newPoint.x, newPoint.y);

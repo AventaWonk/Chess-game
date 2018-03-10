@@ -1,19 +1,19 @@
-import ChessGame from './ChessGame';
+import {Point} from '../../Interfaces/Point';
+import {playerId} from '../../Constants/defaults';
 import VirtualChessboard from './VirtualChessboard';
-import {Coordinate} from './Types/Coordinate';
 
 export abstract class AbstractPiece {
-  private position: Coordinate;
+  private position: Point;
   private side: number;
   private _isFirstMove: boolean = true;
   protected notationIdentifier: String;
 
-  constructor(side: number, position: Coordinate) {
+  constructor(side: number, position: Point) {
     this.side = side;
     this.position = position;
   }
 
-  public abstract getMoves(virtualChessboardLink: VirtualChessboard): Coordinate[];
+  public abstract getMoves(virtualChessboardLink: VirtualChessboard): Point[];
   public abstract getWeight(): number;
   public abstract getCode(): string;
   protected abstract getWhiteImage(): string;
@@ -54,7 +54,7 @@ export abstract class AbstractPiece {
   public getImage(imageSize: string): HTMLImageElement {
     let img = document.createElement("img");
 
-    if (this.side == ChessGame.WHTIE) {
+    if (this.side == playerId.WHITE) {
       img.src = this.getWhiteImage();
     } else {
       img.src = this.getBlackImage();
@@ -72,11 +72,11 @@ export abstract class AbstractPiece {
     return this.side;
   }
 
-  public updatePosition(position: Coordinate): void {
+  public updatePosition(position: Point): void {
     this.position = position;
   }
 
-  public getPosition(): Coordinate {
+  public getPosition(): Point {
     return this.position;
   }
 
@@ -88,11 +88,11 @@ export abstract class AbstractPiece {
     return this._isFirstMove;
   }
 
-  protected isOutOfBoard(point: Coordinate): boolean {
+  protected isOutOfBoard(point: Point): boolean {
     return (point.x > 7 || point.y > 7) || (point.x < 0 || point.y < 0);
   }
 
-  protected getValidMoves(points: Coordinate[]): Coordinate[] {
+  protected getValidMoves(points: Point[]): Point[] {
     let validMoves = [];
 
     for (let i = 0; i < points.length; i++) {
@@ -123,11 +123,11 @@ export class Pawn extends AbstractPiece {
   }
 
   public getMoves(virtualChessboardLink: VirtualChessboard) {
-    let moves: Coordinate[] = [];
+    let moves: Point[] = [];
     let currentPosition = this.getPosition();
     let l: number;
 
-    if (this.getSide() == ChessGame.WHTIE) {
+    if (this.getSide() == playerId.WHITE) {
       l = 1;
     } else {
       l = -1;
@@ -192,8 +192,8 @@ export class Bishop extends AbstractPiece {
 
   public getMoves(virtualChessboardLink: VirtualChessboard) {
     let currentPosition = this.getPosition();
-    let pointsOnVector1: Coordinate[] = [];
-    let pointsOnVector2: Coordinate[] = [];
+    let pointsOnVector1: Point[] = [];
+    let pointsOnVector2: Point[] = [];
     let vector1IsOpen = true;
     let vector2IsOpen = true;
 
@@ -281,7 +281,7 @@ export class King extends AbstractPiece {
   }
 
   public getMoves() {
-    let moves: Coordinate[] = [];
+    let moves: Point[] = [];
     let currentPosition = this.getPosition();
 
     for (let x = currentPosition.x - 1; x < currentPosition.x + 2; x++) {
@@ -336,7 +336,7 @@ export class Queen extends AbstractPiece {
   }
 
   public getMoves() {
-    let moves: Coordinate[] = [];
+    let moves: Point[] = [];
     let currentPosition = this.getPosition();
 
     for (let x = 0; x < 8; x++) {
@@ -391,7 +391,7 @@ export class Rook extends AbstractPiece {
   }
 
   public getMoves() {
-    let moves: Coordinate[] = [];
+    let moves: Point[] = [];
     let currentPosition = this.getPosition();
 
     for (let x = 0; x < 8; x++) {
@@ -431,7 +431,7 @@ export class Knight extends AbstractPiece {
   }
 
   public getMoves() {
-    let moves: Coordinate[] = [];
+    let moves: Point[] = [];
     let currentPosition = this.getPosition();
 
     moves.push({
