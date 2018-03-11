@@ -1,10 +1,9 @@
 import * as React from "react";
-import {size, color} from '../../../Constants/defaults';
 import {Point} from '../../../Interfaces/Point';
-// import {AbstractPiece, Bishop, King, Knight, Pawn, Queen, Rook} from '../types/Piece';
 
 export interface PieceProps {
-  image: string;
+  width: number;
+  imageLink: string;
 }
 
 interface PieceState {
@@ -15,6 +14,9 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
 
   constructor(props: PieceProps) {
     super(props);
+    this.state = {
+      isSelected: false,
+    }
     this.handleClick = this.handleClick.bind(this);
   }
 
@@ -22,19 +24,23 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
     this.setState({
       isSelected: true,
     });
+
     // select piece
+    // this.props.selectPiece();
   }
 
   render() {
-    let style = {
-
-    }
     if (this.state.isSelected) {
 
     }
 
+    let style = {
+      width: this.props.width + 'px',
+      cursor: "pointer",
+    }
+
     return (
-      <img src={this.props.image} style={style} onClick={this.handleClick}/>
+      <img src={this.props.imageLink} style={style} onClick={this.handleClick}/>
     );
   }
 }

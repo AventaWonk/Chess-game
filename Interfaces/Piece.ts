@@ -1,6 +1,8 @@
+import {Point} from './Point';
 
 export interface IPiece {
    getWeight(): number;
    getCode(): string;
-   getImage(imageSize: string): HTMLImageElement ;
+   getImage(): string;
+   getPosition(): Point;
 }

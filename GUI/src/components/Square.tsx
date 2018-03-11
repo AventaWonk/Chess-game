@@ -28,7 +28,7 @@ export default class Square extends React.Component<SquareProps, SquareState> {
         x: this.props.x,
         y: this.props.y,
       }
-      this.props.doMove(from, to);
+      // this.props.doMove(this.props.selectedPiecePosition, to);
     }
   }
 
