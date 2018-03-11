@@ -1,8 +1,9 @@
 import {Point} from '../../Interfaces/Point';
+import {IPiece} from '../../Interfaces/Piece';
 import {playerId} from '../../Constants/defaults';
 import VirtualChessboard from './VirtualChessboard';
 
-export abstract class AbstractPiece {
+export abstract class AbstractPiece implements IPiece {
   private position: Point;
   private side: number;
   private _isFirstMove: boolean = true;
@@ -51,17 +52,12 @@ export abstract class AbstractPiece {
     return parseInt("1" + this.getSide().toString() + Number(this.isFirstMove).toString() + this.getCode(), 2); // Side|1 + First move flag|1 + Piece code|3
   }
 
-  public getImage(imageSize: string): HTMLImageElement {
-    let img = document.createElement("img");
-
+  public getImage(): string {
     if (this.side == playerId.WHITE) {
-      img.src = this.getWhiteImage();
-    } else {
-      img.src = this.getBlackImage();
+      return this.getWhiteImage();
     }
-    img.style.height = imageSize + "px";
 
-    return img;
+    return this.getBlackImage();
   }
 
   public setFirstMoveAsIsDone() {
