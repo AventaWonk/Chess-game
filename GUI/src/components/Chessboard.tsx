@@ -76,6 +76,7 @@ export interface ChessboardProps {
 
 interface ChessboardState {
   pieceImages: string[];
+  highlightedSquares: boolean[];
 }
 
 export default class Chessboard extends React.Component<ChessboardProps, ChessboardState> {
@@ -87,8 +88,10 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
 
   constructor(props: ChessboardProps) {
     super(props);
-    // let chessBoardElement = generateChessboardElement(props.side);
+    this.handlePieceSelection = this.handlePieceSelection.bind(this);
+    this.handleMove = this.handleMove.bind(this);
 
+    let highlightedSquares = generateChessboard();
     let pieceImages = generateChessboard();
     for (let i = 0; i < props.pieces.length; i++) {
       let currentPiece = props.pieces[i];
@@ -99,10 +102,15 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
 
     this.state = {
       pieceImages: pieceImages,
+      highlightedSquares: highlightedSquares,
     };
   }
 
-  doMove(from: Point, to: Point) {
+  handlePieceSelection() {
+    this.chessEngine.
+  }
+
+  handleMove(from: Point, to: Point) {
     let newChessboardState: any = {...this.state.pieceImages};
     newChessboardState[to.x][to.y] = newChessboardState[from.x][from.y];
     newChessboardState[from.x][from.y] = null;
@@ -126,15 +134,19 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
       let rowSquares: any[] = [];
 
       for (let j = 0; j < 8; j++) {
+        let coordinate: Point = {
+          x: j,
+          y: i - 1,
+        }
         let pieceImage = this.state.pieceImages[i][j];
         let piece;
 
         if (pieceImage) {
-          piece = <Piece width={this.pieceSize} imageLink={pieceImage}/>
+          piece = <Piece position={coordinate} width={this.pieceSize} imageLink={pieceImage} onPieceSelection={this.handlePieceSelection}/>
         }
 
         rowSquares.push(
-          <Square x={j} y={i - 1} color={this.getSquareColor(i, j)} size={this.squareSize} isPieceSelected={false} key={(i+1) * (j+64)}>
+          <Square coordinate={coordinate} color={this.getSquareColor(i, j)} size={this.squareSize} selectedPiecePosition={null} onMove={this.handleMove} key={(i+1) * (j+64)}>
             {piece}
           </Square>
         );

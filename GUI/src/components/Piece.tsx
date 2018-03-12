@@ -2,8 +2,10 @@ import * as React from "react";
 import {Point} from '../../../Interfaces/Point';
 
 export interface PieceProps {
+  position: Point;
   width: number;
   imageLink: string;
+  onPieceSelection: Function;
 }
 
 interface PieceState {
@@ -26,7 +28,7 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
     });
 
     // select piece
-    // this.props.selectPiece();
+    this.props.onPieceSelection(this.props.position);
   }
 
   render() {
@@ -36,7 +38,9 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
 
     let style = {
       width: this.props.width + 'px',
-      cursor: "pointer",
+      cursor: 'pointer',
+      display: 'block',
+      margin: '0 auto',
     }
 
     return (

@@ -3,11 +3,11 @@ import {size, color} from '../../../Constants/defaults';
 import {Point} from '../../../Interfaces/Point';
 
 export interface SquareProps {
-  x: number;
-  y: number;
+  coordinate: Point;
   color: string;
   size: number;
-  isPieceSelected: boolean;
+  selectedPiecePosition: Point;
+  onMove: Function;
 }
 
 interface SquareState {
@@ -22,13 +22,9 @@ export default class Square extends React.Component<SquareProps, SquareState> {
   }
 
   handleClick() {
-    if (this.props.isPieceSelected) {
+    if (this.props.selectedPiecePosition) {
       // do move
-      let to: Point = {
-        x: this.props.x,
-        y: this.props.y,
-      }
-      // this.props.doMove(this.props.selectedPiecePosition, to);
+      this.props.onMove(this.props.selectedPiecePosition, this.props.coordinate);
     }
   }
 
