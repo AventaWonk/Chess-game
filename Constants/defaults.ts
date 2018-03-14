@@ -1,5 +1,6 @@
 import {Bishop, King, Knight, Pawn, Queen, Rook} from '../Engine/src/Piece';
 import {IPiece} from '../Interfaces/Piece';
+import ChessEngine from '../Engine/src/ChessEngine';
 
 export const playerId = {
   WHITE: 0,
@@ -29,3 +30,4 @@ export const DEFAULT_PIECE_SETUP: IPiece[] = [
     y: 6
   }),
 ];
+export const DEFAULT_CHESS_ENGINE = ChessEngine;
