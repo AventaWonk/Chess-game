@@ -2,6 +2,7 @@ import {Point}  from '../../Interfaces/Point';
 import {Move, AvalibleMoves} from '../../Interfaces/Move';
 import {AbstractPiece} from './Piece';
 import VirtualChessboard from './VirtualChessboard';
+import {IChessEngine} from '../../Interfaces/ChessEngine';
 
 interface Brunch {
   vcb: number[];
@@ -16,14 +17,14 @@ interface Result {
   evaluation: number;
 }
 
-export default class ChessEngine {
+export default class ChessEngine implements IChessEngine {
   private side: number;
   private virtualChessBoard: VirtualChessboard;
-  private onMoveDeterminedEvent: Function;
+  // private onMoveDeterminedEvent: Function;
 
-  constructor(onMoveDeterminedEvent: Function) {
+  constructor() {
     this.virtualChessBoard = new VirtualChessboard();
-    this.onMoveDeterminedEvent = onMoveDeterminedEvent.bind(this);
+    // this.onMoveDeterminedEvent = onMoveDeterminedEvent.bind(this);
   }
 
   private getAllAvalibleMoves(virtualChessBoard: VirtualChessboard, side: number): AvalibleMoves[] {
@@ -170,11 +171,11 @@ export default class ChessEngine {
     return bestEval;
   }
 
-  public analyze(depth: number): void {
+  public analyze(depth: number): Move {
     let movesTree = this.generateMoves(1, 1, this.virtualChessBoard, this.side);
 
     let max = -1000;
-    let max_R;
+    let max_R: Move;
     for (let i = 0; i < movesTree.length; i++) {
       let vcb = VirtualChessboard.unserialize(movesTree[i].vcb);
       let evaluation = this.calculateEvaluation(1, 2, vcb, this.side ^ 1, -10000, 10000);
@@ -187,15 +188,20 @@ export default class ChessEngine {
 
     }
 
-    this.onMoveDeterminedEvent(max_R);
+    // this.onMoveDeterminedEvent(max_R);
+    return max_R;
   }
 
-  public move(move: Move): void {
-    let movablePiece = this.virtualChessBoard.getPiece(move.oldPosition.x, move.oldPosition.y);
+  public getAvalibleMoves(position: Point) {
+    return this.virtualChessBoard.getPiece(position.x, position.y).getMoves(this.virtualChessBoard);
+  }
 
-    this.virtualChessBoard.movePiece(movablePiece, move.newPosition)
-    this.virtualChessBoard.setPiece(movablePiece, move.newPosition.x, move.newPosition.y);
-    this.virtualChessBoard.removePiece(move.oldPosition.x, move.oldPosition.y);
+  public move(from: Point, to: Point): void {
+    let movablePiece = this.virtualChessBoard.getPiece(from.x, from.y);
+
+    this.virtualChessBoard.movePiece(movablePiece, to)
+    this.virtualChessBoard.setPiece(movablePiece, to.x, to.y);
+    this.virtualChessBoard.removePiece(from.x, from.y);
   }
 
   public setPlayer(side: number) {
@@ -204,10 +210,6 @@ export default class ChessEngine {
 
   public setUpPieces(picesSetup: AbstractPiece[]) {
     this.virtualChessBoard.setUpPieces(picesSetup);
-  }
-
-  public getVirtualChessboardLink() {
-    return this.virtualChessBoard;
   }
 
   // private validateMove(oldCoordinate:Point, newCoordinate:Point): boolean {
