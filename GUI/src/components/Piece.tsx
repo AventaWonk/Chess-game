@@ -6,6 +6,8 @@ export interface PieceProps {
   width: number;
   imageLink: string;
   onPieceSelection: Function;
+  onPieceDeselection: Function;
+  borderColor: string;
 }
 
 interface PieceState {
@@ -23,24 +25,34 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
   }
 
   handleClick() {
-    this.setState({
-      isSelected: true,
-    });
+    if (this.state.isSelected) {
+      // unselect
 
-    // select piece
-    this.props.onPieceSelection(this.props.position);
+      this.setState({
+        isSelected: false,
+      });
+      this.props.onPieceDeselection();
+    } else {
+      // select piece
+
+      this.setState({
+        isSelected: true,
+      });
+      this.props.onPieceSelection(this.props.position);
+    }
   }
 
   render() {
-    if (this.state.isSelected) {
-
-    }
-
-    let style = {
+    let style: any = {
       width: this.props.width + 'px',
       cursor: 'pointer',
       display: 'block',
       margin: '0 auto',
+    }
+
+    if (this.state.isSelected) {
+      style.border = `3px solid ${this.props.borderColor}`;
+      style.borderRadius = "10px";
     }
 
     return (

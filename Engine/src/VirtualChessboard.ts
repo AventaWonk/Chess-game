@@ -42,6 +42,7 @@ export default class VirtualChessboard {
   }
 
   public movePiece(piece: AbstractPiece, newPoint: Point): void {
+    // console.log(newPoint);
     let oldX = piece.getPosition().x;
     let oldY = piece.getPosition().y;
     this.setPiece(piece, newPoint.x, newPoint.y);

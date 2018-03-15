@@ -36,7 +36,7 @@ export default class Square extends React.Component<SquareProps, SquareState> {
     }
 
     return (
-      <td style={style} >
+      <td style={style} onClick={this.handleClick}>
         {this.props.children}
       </td>
     );
