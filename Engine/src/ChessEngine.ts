@@ -6,10 +6,8 @@ import {IChessEngine} from '../../Interfaces/ChessEngine';
 
 interface Brunch {
   vcb: number[];
-  side: number;
   move: Move;
   evaluation: number;
-  childrens?: any[];
 }
 
 interface Result {
@@ -18,19 +16,15 @@ interface Result {
 }
 
 export default class ChessEngine implements IChessEngine {
-  private side: number;
   private virtualChessBoard: VirtualChessboard;
-  // private onMoveDeterminedEvent: Function;
 
   constructor() {
     this.virtualChessBoard = new VirtualChessboard();
-    // this.onMoveDeterminedEvent = onMoveDeterminedEvent.bind(this);
   }
 
   private getAllAvalibleMoves(virtualChessBoard: VirtualChessboard, side: number): AvalibleMoves[] {
     let avalibleMoves: AvalibleMoves[] = [];
     let allPieces = virtualChessBoard.getAllPiecesBySide(side);
-
     for (let i = 0; i < allPieces.length; i++) {
       let currentPiece = allPieces[i];
       let avaliblePieceMoves = currentPiece.getMoves(virtualChessBoard);
@@ -80,11 +74,9 @@ export default class ChessEngine implements IChessEngine {
     return evaluation;
   }
 
-  private generateMoves (currentDepth: number, maxDepth: number, vcb: VirtualChessboard, side: number, alpha: number = 0, beta: number = 0): Brunch[] {
+  private generateMoves (side: number, vcb: VirtualChessboard): Brunch[] {
     let brunchs: Brunch[] = [];
     let moves = this.getAllAvalibleMoves(vcb, side);
-    let alpha1 = 0;
-    let beta1 = 0;
 
     if (!moves) {
       return null;
@@ -95,14 +87,16 @@ export default class ChessEngine implements IChessEngine {
 
       for (let k = 0; k < currenMove.newPoints.length; k++) {
         let currentNewPoint = currenMove.newPoints[k];
-        let a = vcb.serialize();
-        let newVcb = VirtualChessboard.unserialize(a);
+        let newVcb = VirtualChessboard.unserialize(vcb.serialize());
         let evaluation = this.evaluateMove(newVcb, currenMove.currentPosition, currentNewPoint);
-        newVcb.movePiece(newVcb.getPiece(currenMove.currentPosition.x, currenMove.currentPosition.y), currentNewPoint);
-
+        let piece = newVcb.getPiece(currenMove.currentPosition.x, currenMove.currentPosition.y);
+        // newVcb.movePiece(piece, currentNewPoint);
+        piece.setFirstMoveAsIsDone()
+        newVcb.setPiece(piece, currentNewPoint.x, currentNewPoint.y)
+        newVcb.removePiece(currenMove.currentPosition.x, currenMove.currentPosition.y)
+        
         let newBrunch = {
           vcb: newVcb.serialize(),
-          side: side,
           move: {
             oldPosition: currenMove.currentPosition,
             newPosition: currentNewPoint,
@@ -113,20 +107,10 @@ export default class ChessEngine implements IChessEngine {
       }
     }
 
-    // if (currentDepth < maxDepth * 2) {
-    //   for (let i = 0; i < brunchs.length; i++) {
-    //     // generate moves for each vcb
-    //     brunchs[i].childrens = [];
-    //     let currentVcb = VirtualChessboard.unserialize(brunchs[i].vcb);
-    //     let generatedMoves = this.generateMoves(currentDepth + 1, maxDepth, currentVcb, side ^ 1, alpha1, beta1);
-    //     brunchs[i].childrens.push(generatedMoves);
-    //   }
-    // }
-
     return brunchs;
   }
 
-  private calculateEvaluation(currentDepth: number, maxDepth: number, vcb: VirtualChessboard, side: number, alpha: number, beta: number): number {
+  private calculateEvaluation(initialSide: number, currentDepth: number, maxDepth: number, vcb: VirtualChessboard, side: number, alpha: number, beta: number): number {
     let evaluation = 0;
     let bestEval = 0;
     let moves = this.getAllAvalibleMoves(vcb, side);
@@ -143,20 +127,20 @@ export default class ChessEngine implements IChessEngine {
         let vcbCopy = VirtualChessboard.unserialize(vcb.serialize());
         evaluation = this.evaluateMove(vcbCopy, currenMove.currentPosition, currentNewPoint);
 
-        if (side != this.side) {
+        if (side != initialSide) {
           evaluation = -evaluation;
         }
 
         if (currentDepth < maxDepth * 2) {
           vcbCopy.movePiece(vcbCopy.getPiece(currenMove.currentPosition.x, currenMove.currentPosition.y), currentNewPoint);
-          evaluation += this.calculateEvaluation(currentDepth + 1, maxDepth, vcbCopy, side ^ 1, alpha, beta);
+          evaluation += this.calculateEvaluation(initialSide, currentDepth + 1, maxDepth, vcbCopy, side ^ 1, alpha, beta);
         }
 
-        if ((side == this.side && evaluation > bestEval) || (side != this.side && evaluation < bestEval) ||  (i == 0 && j == 0)) {
+        if ((side == initialSide && evaluation > bestEval) || (side != initialSide && evaluation < bestEval) ||  (i == 0 && j == 0)) {
           bestEval = evaluation;
         }
 
-        if (side == this.side) {
+        if (side == initialSide) {
           alpha = Math.max(alpha, evaluation);
         } else {
           beta = Math.min(beta, evaluation);
@@ -171,15 +155,17 @@ export default class ChessEngine implements IChessEngine {
     return bestEval;
   }
 
-  public analyze(depth: number): Move {
-    let movesTree = this.generateMoves(1, 1, this.virtualChessBoard, this.side);
-
+  public analyze(side: number, depth: number): Move {
+    let movesTree = this.generateMoves(side, this.virtualChessBoard);
+    console.log(movesTree)
     let max = -1000;
     let max_R: Move;
     for (let i = 0; i < movesTree.length; i++) {
       let vcb = VirtualChessboard.unserialize(movesTree[i].vcb);
-      let evaluation = this.calculateEvaluation(1, 2, vcb, this.side ^ 1, -10000, 10000);
+      let evaluation = this.calculateEvaluation(side, 1, depth, vcb, side ^ 1, -10000, 10000);
       evaluation += movesTree[i].evaluation;
+      // console.log(movesTree[i].vcb)
+      // console.log(evaluation)
 
       if (evaluation > max) {
           max = evaluation;
@@ -199,34 +185,12 @@ export default class ChessEngine implements IChessEngine {
   public move(from: Point, to: Point): void {
     let movablePiece = this.virtualChessBoard.getPiece(from.x, from.y);
 
-    this.virtualChessBoard.movePiece(movablePiece, to)
-    this.virtualChessBoard.setPiece(movablePiece, to.x, to.y);
-    this.virtualChessBoard.removePiece(from.x, from.y);
-  }
-
-  public setPlayer(side: number) {
-    this.side = side;
+    this.virtualChessBoard.movePiece(movablePiece, to);
+    // this.virtualChessBoard.setPiece(movablePiece, to.x, to.y);
+    // this.virtualChessBoard.removePiece(from.x, from.y);
   }
 
   public setUpPieces(picesSetup: AbstractPiece[]) {
     this.virtualChessBoard.setUpPieces(picesSetup);
   }
-
-  // private validateMove(oldCoordinate:Point, newCoordinate:Point): boolean {
-  //   let movablePiece = this.virtualChessBoard.getPiece(oldCoordinate.x, oldCoordinate.y);
-  //
-  //   if (!movablePiece) {
-  //     return false;
-  //   }
-  //
-  //   if (movablePiece.getSide() != this.side) {
-  //     return false;
-  //   }
-  //
-  //   if ((newCoordinate.x > 7 || newCoordinate.y > 7) || (newCoordinate.x < 0 || newCoordinate.y < 0)) {
-  //     return false;
-  //   }
-  //
-  //   return true;
-  // }
 }
