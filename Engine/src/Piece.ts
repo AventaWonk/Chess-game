@@ -24,10 +24,10 @@ export abstract class AbstractPiece implements IPiece {
     let byte = number.toString(2);
     let side = parseInt(byte[1], 2);
     let firstMoveFlag = parseInt(byte[2], 2);
-    let piceCode = byte.substr(3, 3);
+    let pieceCode = byte.substr(3, 3);
     let piece;
 
-    switch (piceCode) {
+    switch (pieceCode) {
       case "001":
         piece = new Pawn(side, {x: 0, y: 0});
         break;
@@ -255,7 +255,7 @@ export class Bishop extends AbstractPiece {
       }
     }
 
-    return [].concat(pointsOnVector1, pointsOnVector2);;
+    return [].concat(pointsOnVector1, pointsOnVector2);
   }
 }
 
