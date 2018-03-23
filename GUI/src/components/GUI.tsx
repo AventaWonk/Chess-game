@@ -5,7 +5,9 @@ import {IChessEngine} from '../../../Interfaces/ChessEngine';
 import {IPiece} from '../../../Interfaces/Piece';
 
 export interface GUIProps {}
-interface GUIState {}
+interface GUIState {
+  isGameOver: boolean,
+}
 
 export default class GUI extends React.Component<GUIProps, GUIState> {
   private player: number;
@@ -18,12 +20,39 @@ export default class GUI extends React.Component<GUIProps, GUIState> {
     this.pieceSetup = DEFAULT_PIECE_SETUP;
     this.chessEngine = new DEFAULT_CHESS_ENGINE();
     this.chessEngine.setUpPieces(this.pieceSetup);
+    this.handleGameOver = this.handleGameOver.bind(this);
+    this.handleNewGameStart = this.handleNewGameStart.bind(this);
+    this.state = {
+      isGameOver: false,
+    }
+  }
+
+  handleNewGameStart() {
+    this.setState({
+      isGameOver: true,
+    });
+  }
+
+  handleGameOver() {
+    this.setState({
+      isGameOver: true,
+    });
   }
 
   render() {
+    let bodyElement;
+
     return (
       <div>
-        <Chessboard side={this.player} pieces={this.pieceSetup} chessEngine={this.chessEngine}/>
+        <div>
+          <Chessboard side={this.player} pieces={this.pieceSetup} chessEngine={this.chessEngine}
+          isHold={this.state.isGameOver} onGameOverEvent={this.handleGameOver}/>
+        </div>
+        <div>
+          <button onClick={this.handleNewGameStart}>
+            Start a new game
+          </button>
+        </div>
       </div>
     );
   }
