@@ -17,18 +17,26 @@ export const size = {
   DEFAULT_IMAGE_SIZE: 40,
 };
 export const NOTATION_LETTERS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-export const DEFAULT_PIECE_SETUP: IPiece[] = [
-  new Pawn(playerId.WHITE, {
-    x: 3,
-    y: 0
-  }),
-  new Pawn(playerId.WHITE, {
-    x: 4,
-    y: 0
-  }),
-  new Bishop(playerId.BLACK, {
-    x: 6,
-    y: 6
-  }),
-];
 export const DEFAULT_CHESS_ENGINE = ChessEngine;
+
+let getDefaultPieceSetup = () => {
+  let pieceSetup: IPiece[] = [];
+
+  for (let i = 0; i < 8; i++) {
+    pieceSetup.push(
+      new Pawn(playerId.WHITE, {
+        x: i,
+        y: 1
+      })
+    );
+    pieceSetup.push(
+      new Pawn(playerId.BLACK, {
+        x: i,
+        y: 6
+      })
+    );
+  }
+
+  return pieceSetup;
+}
+export const DEFAULT_PIECE_SETUP: IPiece[] = getDefaultPieceSetup();
