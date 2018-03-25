@@ -89,7 +89,7 @@ export default class ChessEngine implements IChessEngine {
         piece.setFirstMoveAsIsDone()
         newVcb.setPiece(piece, currentNewPoint.x, currentNewPoint.y)
         newVcb.removePiece(currentMove.currentPosition.x, currentMove.currentPosition.y)
-        
+
         let newBrunch = {
           vcb: newVcb.serialize(),
           move: {
@@ -105,7 +105,13 @@ export default class ChessEngine implements IChessEngine {
     return brunches;
   }
 
-  private calculateEvaluation(initialSide: number, currentDepth: number, maxDepth: number, vcb: VirtualChessboard, side: number, alpha: number, beta: number): number {
+  private calculateEvaluation(initialSide: number,
+                              currentDepth: number,
+                              maxDepth: number,
+                              vcb: VirtualChessboard,
+                              side: number,
+                              alpha: number,
+                              beta: number): number {
     let evaluation = 0;
     let bestEval = 0;
     let moves = this.getAllAvailableMoves(vcb, side);
@@ -182,6 +188,9 @@ export default class ChessEngine implements IChessEngine {
   }
 
   public setUpPieces(piecesSetup: AbstractPiece[]) {
-    this.virtualChessBoard.setUpPieces(piecesSetup);
+    let pieceSetupClone = piecesSetup.map((piece) => {
+      return Object.create(piece)
+    })
+    this.virtualChessBoard.setUpPieces(pieceSetupClone);
   }
 }
