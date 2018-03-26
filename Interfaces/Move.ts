@@ -5,7 +5,7 @@ export interface Move {
   newPosition: Point;
 }
 
-export interface AvalibleMoves {
+export interface AvailableMoves {
   currentPosition: Point;
   newPoints: Point[];
 }

@@ -1,10 +1,12 @@
 import {Move} from './Move';
 import {IPiece} from './Piece';
 import {Point} from './Point';
+import {PieceSet} from '../Engine/src/PieceSet';
 
 export interface IChessEngine {
-  setUpPieces(picesSetup: IPiece[]): void;
+  setUpPieces(piecesSetup: IPiece[]): void;
   analyze(side: number, depth: number): Move;
   move(from: Point, to: Point): void;
-  getAvalibleMoves(position: Point): Point[];
+  getAvailableMoves(position: Point): Point[];
+  getCurrentPieceSet(): PieceSet;
 }
