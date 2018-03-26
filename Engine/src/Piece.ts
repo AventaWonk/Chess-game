@@ -21,23 +21,27 @@ export abstract class AbstractPiece implements IPiece {
   protected abstract getBlackImage(): string;
 
   public static unserialize(number: number): AbstractPiece {
-    let byte = number.toString(2);
-    let side = parseInt(byte[1], 2);
-    let firstMoveFlag = parseInt(byte[2], 2);
-    let pieceCode = byte.substr(3, 3);
+    let bits = number.toString(2);
+    let side = parseInt(bits[1], 2);
+    let firstMoveFlag = parseInt(bits[2], 2);
+    let pieceCode = bits.substr(3, 3);
+    let position = {
+      x: parseInt(bits.substr(6, 3), 2),
+      y: parseInt(bits.substr(9, 3), 2),
+    }
     let piece;
 
     switch (pieceCode) {
       case "001":
-        piece = new Pawn(side, {x: 0, y: 0});
+        piece = new Pawn(side, position);
         break;
 
       case "111":
-        piece = new Rook(side, {x: 0, y: 0});
+        piece = new Rook(side, position);
         break;
 
       case "011":
-      piece = new Bishop(side, {x: 0, y: 0});
+      piece = new Bishop(side, position);
         break;
     }
 
@@ -48,8 +52,11 @@ export abstract class AbstractPiece implements IPiece {
     return piece;
   }
 
-  public serialize() {
-    return parseInt("1" + this.getSide().toString() + Number(this.isFirstMove).toString() + this.getCode(), 2); // Side|1 + First move flag|1 + Piece code|3
+  public serialize(): number {
+    let x = this.addZerro(this.position.x.toString(2), 3);
+    let y = this.addZerro(this.position.y.toString(2), 3);
+
+    return parseInt("1" + this.getSide().toString() + Number(this.isFirstMove).toString() + this.getCode() + x + y, 2); // Side|1 + First move flag|1 + Piece code|3
   }
 
   public getImage(): string {
@@ -78,6 +85,20 @@ export abstract class AbstractPiece implements IPiece {
 
   public getNotationIdentifer(): String {
     return this.notationIdentifier;
+  }
+
+  private addZerro(string: string, to: number): string {
+    let newString = string;
+
+    if (newString.length == to) {
+      return newString;
+    }
+
+    while (newString.length < to) {
+      newString = "0" + newString;
+    }
+
+    return newString;
   }
 
   protected get isFirstMove() {
