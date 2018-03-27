@@ -73,7 +73,9 @@ const generateChessboard = () => {
 export interface ChessboardProps {
   side: number;
   pieces: IPiece[];
-  chessEngine: IChessEngine
+  chessEngine: IChessEngine;
+  onGameOverEvent: Function;
+  isHold: boolean;
 }
 
 interface ChessboardState {
@@ -101,7 +103,6 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     for (let i = 0; i < props.pieces.length; i++) {
       let currentPiece = props.pieces[i];
       let piecePosition = currentPiece.getPosition();
-      let pieceImage = currentPiece.getImage();
       pieceImages[piecePosition.x][piecePosition.y] = currentPiece.getImage();
     }
 
@@ -112,12 +113,29 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     };
   }
 
+  componentWillReceiveProps(nextProps: ChessboardProps) {
+    if (this.props.isHold != nextProps.isHold) {
+      let pieceImages = generateChessboard();
+      for (let i = 0; i < this.props.pieces.length; i++) {
+        let currentPiece = this.props.pieces[i];
+        let piecePosition = currentPiece.getPosition();
+        pieceImages[piecePosition.x][piecePosition.y] = currentPiece.getImage();
+      }
+
+      this.setState({
+        selectedPiecePosition: null,
+        pieceImages: pieceImages,
+        highlightedSquares: generateChessboard(),
+      });
+    }
+  }
+
   handlePieceSelection(point: Point) {
-    let avalibleSquares = this.props.chessEngine.getAvalibleMoves(point);
+    let availableSquares = this.props.chessEngine.getAvailableMoves(point);
 
     let newHighlightedSquaresState: any = {...this.state.highlightedSquares};
-    for (let i = 0; i < avalibleSquares.length; i++) {
-      let currentPoint = avalibleSquares[i];
+    for (let i = 0; i < availableSquares.length; i++) {
+      let currentPoint = availableSquares[i];
       newHighlightedSquaresState[currentPoint.x][currentPoint.y] = true;
     }
 
@@ -212,8 +230,14 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
       );
     }
 
+    let pointerEvents = 'all';
+    if (this.props.isHold) {
+      pointerEvents = 'none';
+    }
+
     let tableStyle = {
-      borderCollapse: "collapse",
+      borderCollapse: 'collapse',
+      pointerEvents: pointerEvents,
     }
 
     return (
