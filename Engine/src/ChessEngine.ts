@@ -12,9 +12,11 @@ interface Result {
 
 export default class ChessEngine implements IChessEngine {
   private virtualChessBoard: VirtualChessboard;
+  private timeoutFlag: boolean;
 
   constructor() {
     this.virtualChessBoard = new VirtualChessboard();
+    this.setTimeoutFlag = this.setTimeoutFlag.bind(this);
   }
 
   private getAllAvailableMoves(virtualChessBoard: VirtualChessboard, side: number): AvailableMoves[] {
@@ -134,8 +136,82 @@ export default class ChessEngine implements IChessEngine {
     return result;
   }
 
+  private setTimeoutFlag(): void {
+    this.timeoutFlag = true;
+  }
+
+  private calculateEvaluationByTime(initialSide: number,
+                              vcb: VirtualChessboard,
+                              side: number,
+                              alpha: number,
+                              beta: number,
+                              depth?: number ): Result {
+    let result: Result = {
+      eval: 0,
+      move: null,
+    }
+
+    let evaluation = 0;
+    let bestEval = 0;
+    let moves = this.getAllAvailableMoves(vcb, side);
+
+    if (!moves) {
+      return result;
+    }
+
+    for (let i = 0; i < moves.length; i++) {
+      let currentMove = moves[i];
+
+      for (let j = 0; j < currentMove.newPoints.length; j++) {
+        let currentNewPoint = currentMove.newPoints[j];
+        // let vcbCopy = Object.create(vcb);
+        let vcbCopy = VirtualChessboard.unserialize(vcb.serialize());
+        evaluation = this.evaluateMove(vcbCopy, currentMove.currentPosition, currentNewPoint);
+
+        if (side != initialSide) {
+          evaluation = -evaluation;
+        }
+
+        if (!this.timeoutFlag) {
+          vcbCopy.movePiece(vcbCopy.getPiece(currentMove.currentPosition.x, currentMove.currentPosition.y), currentNewPoint);
+          evaluation += this.calculateEvaluationByTime(initialSide, vcbCopy, side ^ 1, alpha, beta).eval;
+        }
+
+        if ((side == initialSide && evaluation > bestEval) || (side != initialSide && evaluation < bestEval) ||  (i == 0 && j == 0)) {
+          bestEval = evaluation;
+          result.eval = evaluation;
+
+
+          result.move = {
+            oldPosition: currentMove.currentPosition,
+            newPosition: currentMove.newPoints[j],
+          };
+        }
+
+        if (side == initialSide) {
+          alpha = Math.max(alpha, evaluation);
+        } else {
+          beta = Math.min(beta, evaluation);
+        }
+
+        if (alpha >= beta) {
+          break;
+        }
+      }
+    }
+
+    return result;
+  }
+
   public analyze(side: number, depth: number): Move {
     return this.calculateEvaluation(side, 1, depth, this.virtualChessBoard, side, -10000, 10000).move;
+  }
+
+  public analyzeByTime(side: number, time: number): Move {
+    this.timeoutFlag = false;
+    setTimeout(this.setTimeoutFlag, time)
+
+    return this.calculateEvaluationByTime(side, this.virtualChessBoard, side, -10000, 10000).move;
   }
 
   public getAvailableMoves(position: Point) {
