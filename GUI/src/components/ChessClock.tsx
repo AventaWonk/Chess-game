@@ -1,6 +1,14 @@
 import * as React from "react";
 
-const getTimeBySeconds = (seconds: number) => {
+const getTimeBySeconds = (seconds: number): Time => {
+  if (seconds < 1) {
+    return {
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    }
+  }
+
   return {
     hours: Math.floor(seconds / 3600),
     minutes: Math.floor((seconds / 60)) % 60,
@@ -16,8 +24,10 @@ interface Time {
 
 export interface ChessClockProps {
   isPaused: boolean;
-  timeLimit?: number;
+  initialTime?: number;
+  secondsLimit?: number;
   onTimeLeftEvent: () => void;
+  onTimerTickEvent: (currentSeconds: number) => void;
 }
 
 interface ChessClockState {
@@ -30,33 +40,16 @@ export default class ChessClock extends React.Component<ChessClockProps, ChessCl
 
   constructor(props: ChessClockProps) {
     super(props);
-    this.startTime = new Date().getTime();
+    if (!this.props.initialTime) {
+      this.startTime = new Date().getTime();
+    } else {
+      this.startTime = this.props.initialTime;
+    }
     this.handleIntervalTick = this.handleIntervalTick.bind(this);
     this.intervalId = setInterval(this.handleIntervalTick, 1000);
     this.state = {
-      time: {
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      }
+      time: this.getViewTime(this.startTime),
     }
-  }
-
-  handleIntervalTick() {
-    let seconds;
-    if (this.props.timeLimit) {
-      seconds = Math.round((this.startTime + this.props.timeLimit * 60 * 1000 - new Date().getTime()) / 1000);
-
-      if (seconds < 0) {
-        clearInterval(this.intervalId);
-      }
-    } else {
-      seconds = Math.round((new Date().getTime() - this.startTime) / 1000);
-    }
-
-    this.setState({
-      time: getTimeBySeconds(seconds)
-    })
   }
 
   componentWillReceiveProps(nextProps: ChessClockProps) {
@@ -69,11 +62,42 @@ export default class ChessClock extends React.Component<ChessClockProps, ChessCl
     }
   }
 
+  getViewTime(milliseconds: number): Time {
+    let seconds;
+
+    if (this.props.secondsLimit) {
+      seconds = Math.round((this.startTime + this.props.secondsLimit * 1000 - milliseconds) / 1000);
+
+      if (seconds < 0) {
+        this.handleTimeLeft();
+      }
+    } else {
+      seconds = Math.round((milliseconds - this.startTime) / 1000);
+    }
+
+    return getTimeBySeconds(seconds);
+  }
+
+  handleIntervalTick() {
+    let currentMilliseconds = new Date().getTime();
+    let currentTime = this.getViewTime(currentMilliseconds);
+
+    this.setState({
+      time: currentTime,
+    })
+    this.props.onTimerTickEvent(currentMilliseconds);
+  }
+
+  handleTimeLeft() {
+    clearInterval(this.intervalId);
+    this.props.onTimeLeftEvent();
+  }
+
   render() {
     return (
       <div>
-        {this.state.time.hours} :
-        {this.state.time.minutes} :
+        {this.state.time.hours}:
+        {this.state.time.minutes}:
         {this.state.time.seconds}
       </div>
     );
