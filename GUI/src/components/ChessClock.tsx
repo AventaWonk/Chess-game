@@ -24,10 +24,8 @@ interface Time {
 
 export interface ChessClockProps {
   isPaused: boolean;
-  initialTime?: number;
   secondsLimit?: number;
   onTimeLeftEvent: () => void;
-  onTimerTickEvent: (currentSeconds: number) => void;
 }
 
 interface ChessClockState {
@@ -37,18 +35,22 @@ interface ChessClockState {
 export default class ChessClock extends React.Component<ChessClockProps, ChessClockState> {
   private startTime: number;
   private intervalId: NodeJS.Timer;
+  private lastTimeBeforePaused: number;
 
   constructor(props: ChessClockProps) {
     super(props);
-    if (!this.props.initialTime) {
-      this.startTime = new Date().getTime();
-    } else {
-      this.startTime = this.props.initialTime;
-    }
     this.handleIntervalTick = this.handleIntervalTick.bind(this);
-    this.intervalId = setInterval(this.handleIntervalTick, 1000);
-    this.state = {
-      time: this.getViewTime(this.startTime),
+    console.log(props)
+    if (!props.isPaused) {
+      this.startTime = new Date().getTime();
+      this.intervalId = setInterval(this.handleIntervalTick, 1000);
+      this.state = {
+        time: getTimeBySeconds(this.getTime(this.startTime)),
+      }
+    } else {
+      this.state = {
+        time: getTimeBySeconds(0),
+      }
     }
   }
 
@@ -56,13 +58,23 @@ export default class ChessClock extends React.Component<ChessClockProps, ChessCl
     if (this.props.isPaused != nextProps.isPaused) {
       if (nextProps.isPaused == true) {
         clearInterval(this.intervalId);
+        this.lastTimeBeforePaused = new Date().getTime();
       } else {
+        if (!this.startTime) { // first start
+          this.startTime = new Date().getTime();
+          this.setState({
+            time: getTimeBySeconds(this.getTime(this.startTime))
+          })
+        }
+
         this.intervalId = setInterval(this.handleIntervalTick, 1000);
+        let pauseDuration = new Date().getTime() - this.lastTimeBeforePaused;
+        this.startTime = this.startTime + pauseDuration;
       }
     }
   }
 
-  getViewTime(milliseconds: number): Time {
+  getTime(milliseconds: number): number {
     let seconds;
 
     if (this.props.secondsLimit) {
@@ -75,17 +87,17 @@ export default class ChessClock extends React.Component<ChessClockProps, ChessCl
       seconds = Math.round((milliseconds - this.startTime) / 1000);
     }
 
-    return getTimeBySeconds(seconds);
+    return seconds;
   }
 
   handleIntervalTick() {
     let currentMilliseconds = new Date().getTime();
-    let currentTime = this.getViewTime(currentMilliseconds);
+    let currentTime = this.getTime(currentMilliseconds);
+    let currentViewTime = getTimeBySeconds(currentTime);
 
     this.setState({
-      time: currentTime,
+      time: currentViewTime,
     })
-    this.props.onTimerTickEvent(currentMilliseconds);
   }
 
   handleTimeLeft() {
@@ -94,8 +106,18 @@ export default class ChessClock extends React.Component<ChessClockProps, ChessCl
   }
 
   render() {
+    let display = "block";
+
+    if (this.props.isPaused) {
+      display = "none";
+    }
+
+    let style = {
+      display: display,
+    };
+
     return (
-      <div>
+      <div style={style}>
         {this.state.time.hours}:
         {this.state.time.minutes}:
         {this.state.time.seconds}
