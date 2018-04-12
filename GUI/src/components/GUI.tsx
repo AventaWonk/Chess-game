@@ -12,13 +12,13 @@ interface GUIProps {
 
 interface GUIState {
   isGameOver: boolean,
+  playerIdMove: number,
 }
 
 export default class GUI extends React.Component<GUIProps, GUIState> {
   private player: number;
   private pieceSetup: IPiece[];
   private chessEngine: IChessEngine;
-  private lastChessClockTime: number;
 
   constructor(props: GUIProps) {
     super(props)
@@ -26,15 +26,16 @@ export default class GUI extends React.Component<GUIProps, GUIState> {
     this.pieceSetup = DEFAULT_PIECE_SETUP;
     this.chessEngine = new DEFAULT_CHESS_ENGINE();
     this.chessEngine.setUpPieces(this.pieceSetup);
-    this.lastChessClockTime = null;
+
     this.handleGameOver = this.handleGameOver.bind(this);
     this.handleNewGameStart = this.handleNewGameStart.bind(this);
     this.handleGameSave = this.handleGameSave.bind(this);
     this.handleTimeLeft = this.handleTimeLeft.bind(this);
     this.handleMoveDone = this.handleMoveDone.bind(this);
-    this.handleChessClockTimerTick = this.handleChessClockTimerTick.bind(this);
+
     this.state = {
       isGameOver: false,
+      playerIdMove: playerId.WHITE,
     }
   }
 
@@ -60,30 +61,25 @@ export default class GUI extends React.Component<GUIProps, GUIState> {
     })
   }
 
-  handleMoveDone(side: number) {
-    let currentInitialTime = this.*[side ^ 1];
-
+  handleMoveDone(side: number, onDoneEvent?: () => void) {
     this.setState({
-      currentInitialTime: currentInitialTime,
-    });
-  }
-
-  handleChessClockTimerTick(time: number) {
-    this.lastChessClockTime = time;
+      playerIdMove: side ^ 1,
+    }, onDoneEvent)
   }
 
   render() {
     let bodyElement;
 
+    let isWhitePlayerMove: boolean = this.state.playerIdMove == playerId.WHITE;
 
     return (
       <div>
         <div>
           <Chessboard side={this.player} pieces={this.pieceSetup} chessEngine={this.chessEngine}
-          isHold={this.state.isGameOver} onGameOverEvent={this.handleGameOver}
+          isHold={false} onGameOverEvent={this.handleGameOver}
           onMoveDoneEvent={this.handleMoveDone}/>
-          <ChessClock isPaused={false} secondsLimit={15} latestTime={this.lastChessClockTime}
-          onTimeLeftEvent={this.handleTimeLeft} onTimerTickEvent={this.handleChessClockTimerTick} />
+          <ChessClock isPaused={!isWhitePlayerMove} secondsLimit={15} onTimeLeftEvent={this.handleTimeLeft} />
+          <ChessClock isPaused={isWhitePlayerMove} secondsLimit={15} onTimeLeftEvent={this.handleTimeLeft} />
         </div>
         <div>
           <button onClick={this.handleNewGameStart}>
