@@ -5,4 +5,5 @@ export interface IPiece {
    getCode(): string;
    getImage(): string;
    getPosition(): Point;
+   updatePosition(position: Point): void;
 }
