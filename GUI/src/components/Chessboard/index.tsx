@@ -5,10 +5,10 @@ import {IPiece} from '../../../../Interfaces/Piece';
 import {IChessEngine} from '../../../../Interfaces/ChessEngine';
 import Table from './Table';
 import Square from './Square';
-import Piece from './Piece';
+import Piece from '../Piece';
 
-const generateArray2D = () => {
-  let array2D: any[] = [];
+const generate2dArray = function <T>(): T[][] {
+  let array2D: T[][] = [];
 
   for (let i = 0; i < 8; i++) {
     array2D[i] = [];
@@ -43,31 +43,48 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     this.handlePieceClick = this.handlePieceClick.bind(this);
     this.state = {
       pieces: [...this.props.pieces],
-      highlightedSquares: generateArray2D(),
+      highlightedSquares: generate2dArray(),
     }
   }
 
   handleSquareClick(position: Point) {
-    if (this.selectedPiece) {
-      let pieces = [...this.state.pieces];
+    if (!this.selectedPiece) {
+      return;
+    }
 
-      for (let i = 0; i < pieces.length; i++) {
+    if (!this.state.highlightedSquares[position.x][position.y]) {
+      return;
+    }
 
-        if (pieces[i] == this.selectedPiece) {
-          pieces[i].updatePosition(position)
-          this.setState({
-            pieces: pieces,
-          })
-          break;
-        }
+    let pieces = [...this.state.pieces];
+    for (let i = 0; i < pieces.length; i++) {
+
+      if (pieces[i] == this.selectedPiece) {
+        pieces[i].updatePosition(position)
+        this.setState({
+          pieces: pieces,
+        })
+        break;
       }
     }
   }
 
-  handlePieceClick(position: Point) {
+  handlePieceClick(position: Point, isSelected: boolean) {
+    if (isSelected) {
+      this.selectedPiece = null;
+      this.setState({
+        highlightedSquares: generate2dArray(),
+      })
+      return;
+    }
+
     let piece = this.getPieceByPosition(position);
 
     if (this.selectedPiece ) {
+      // tryToDoMove()
+      this.setState({
+        highlightedSquares: generate2dArray(),
+      })
       return;
     }
 
@@ -77,8 +94,6 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     this.setState({
       highlightedSquares: highlightedSquares,
     })
-
-    return true;
   }
 
   getPieceByPosition(position: Point): IPiece{
@@ -96,7 +111,7 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
   }
 
   getHighlightedSquaresByPoints(pointsArray: Point[]): boolean[][] {
-    let array2D = generateArray2D();
+    let array2D = generate2dArray<boolean>();
 
     for (let i = 0; i < pointsArray.length; i++) {
       let x = pointsArray[i].x;
@@ -116,7 +131,7 @@ export default class Chessboard extends React.Component<ChessboardProps, Chessbo
     return (
       <React.Fragment>
         {pieces}
-        <Table orientationForPlayer={0} isHold={false} highlightedSquares={this.state.highlightedSquares}
+        <Table orientationForPlayer={0} isHold={this.props.isHold} highlightedSquares={this.state.highlightedSquares}
         onSquareClickEvent={this.handleSquareClick}/>
       </React.Fragment>
     );
