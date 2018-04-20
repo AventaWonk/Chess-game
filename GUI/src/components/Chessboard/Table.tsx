@@ -1,6 +1,7 @@
 import * as React from "react";
 import Square from './Square';
-import {size, color, playerId, NOTATION_LETTERS} from '../../../../Constants/defaults';
+import {playerId} from '../../../../Constants/defaults';
+import {NOTATION_LETTERS} from '../../../../Constants/defaults';
 import {Point} from '../../../../Interfaces/Point';
 import {IPiece} from '../../../../Interfaces/Piece';
 import {IChessEngine} from '../../../../Interfaces/ChessEngine';
@@ -21,6 +22,10 @@ const getArray = () => {
 export interface TableProps {
   orientationForPlayer: number;
   isHold: boolean;
+  squareSize: number;
+  whiteSquareColor: string;
+  blackSquareColor: string;
+  highlightColor: string;
   highlightedSquares: boolean[][];
   onSquareClickEvent: (position: Point) => void;
 }
@@ -30,16 +35,10 @@ interface TableState {
 }
 
 export default class Table extends React.Component<TableProps, TableState> {
-  private whiteSquareColor = color.DEFAULT_WHITE_SQUARE_COLOR;
-  private blackSquareColor = color.DEFAULT_BLACK_SQUARE_COLOR;
-  private highlightColor = color.DEFAULT_HIGHLIGHTED_SQUARE_COLOR;
-  private selectedPieceBorderColor = color.DEFAULT_SELECTED_PIECE_BORDER_COLOR;
-  private squareSize = size.DEFAULT_SQUARE_SIZE;
-  private pieceSize = size.DEFAULT_IMAGE_SIZE;
 
   constructor(props: TableProps) {
     super(props);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleSquareClick = this.handleSquareClick.bind(this);
   }
 
   componentWillReceiveProps(nextProps: TableProps) {
@@ -48,16 +47,16 @@ export default class Table extends React.Component<TableProps, TableState> {
     }
   }
 
-  handleClick(position: Point) {
+  handleSquareClick(position: Point) {
     this.props.onSquareClickEvent(position);
   }
 
   getSquareColor(x: number, y: number): string {
     if (x % 2 != y % 2) {
-      return this.whiteSquareColor;
+      return this.props.whiteSquareColor;
     }
 
-    return this.blackSquareColor;
+    return this.props.blackSquareColor;
   }
 
   getRowsAndColumns() {
@@ -67,9 +66,28 @@ export default class Table extends React.Component<TableProps, TableState> {
 
       for (let j = 0; j < 8; j++) {
         rowSquares.push(
-          <Square coordinate={{x: j, y: i}} size={this.squareSize} isHighlighted={this.props.highlightedSquares[i][j]}
-          color={this.getSquareColor(i, j)} highlightedColor={this.highlightColor}
-          onClick={this.handleClick} key={(i+1) * (j+64)}/>
+          <Square coordinate={{x: j, y: i}} size={this.props.squareSize} isHighlighted={this.props.highlightedSquares[i][j]}
+          color={this.getSquareColor(i, j)} highlightedColor={this.props.highlightColor}
+          onClick={this.handleSquareClick} key={(i+1) * (j+64)}/>
+        );
+      }
+      chessBoardElement.push(
+        <tr key={i}>{rowSquares}</tr>
+      );
+    }
+    return chessBoardElement;
+  }
+
+  getRowsAndColumns2() {
+    let chessBoardElement: any = [];
+    for (let i = 0; i < 8; i++) {
+      let rowSquares: any[] = [];
+
+      for (let j = 7; j >= 0; j--) {
+        rowSquares.push(
+          <Square coordinate={{x: i, y: j}} size={this.props.squareSize} isHighlighted={this.props.highlightedSquares[i][j]}
+          color={this.getSquareColor(i, j)} highlightedColor={this.props.highlightColor}
+          onClick={this.handleSquareClick} key={(i+1) * (j+64)}/>
         );
       }
       chessBoardElement.push(
@@ -85,9 +103,15 @@ export default class Table extends React.Component<TableProps, TableState> {
       pointerEvents = 'none';
     }
 
+    let transform = '';
+    if (this.props.orientationForPlayer == playerId.BLACK) {
+      transform = 'rotate(180deg)';
+    }
+
     let tableStyle = {
       borderCollapse: 'collapse',
       pointerEvents: pointerEvents,
+      transform: transform,
     }
 
     let chessBoardElement = this.getRowsAndColumns();

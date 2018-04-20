@@ -10,9 +10,7 @@ export interface SquareProps {
   onClick: (position: Point) => void
 }
 
-interface SquareState {
-
-}
+interface SquareState {}
 
 export default class Square extends React.Component<SquareProps, SquareState> {
   constructor(props: SquareProps) {
