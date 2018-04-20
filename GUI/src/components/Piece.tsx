@@ -1,11 +1,15 @@
 import * as React from "react";
-import {Point} from '../../../../Interfaces/Point';
+import {Point} from '../../../Interfaces/Point';
+import {playerId} from '../../../Constants/defaults';
 
 export interface PieceProps {
   position: Point;
   size: number;
   imageLink: string;
-  onClick: (position: Point) => boolean;
+  orientationForPlayer: number;
+  squareSize: number;
+  imgSize: number;
+  onClick: (position: Point, isSelected: boolean) => void;
   onPieceSelection?: Function;
   onPieceDeselection?: Function;
   borderColor: string;
@@ -26,40 +30,31 @@ export default class Piece extends React.Component<PieceProps, PieceState> {
   }
 
   handleClick() {
-    let result = this.props.onClick(this.props.position);
+    this.props.onClick(this.props.position, this.state.isSelected);
 
-    this.setState({
-      isSelected: result,
-    });
-    // if (this.state.isSelected) {
-    //   // unselect
-    //
-    //   this.setState({
-    //     isSelected: false,
-    //   });
-    //   this.props.onPieceDeselection();
-    // } else {
-    //   // select piece
-    //
-    //   this.setState({
-    //     isSelected: true,
-    //   });
-    //   this.props.onPieceSelection(this.props.position);
-    // }
+    this.setState((state) => ({isSelected : !state.isSelected}));
   }
 
   render() {
-    let squareSize = 62;
-    let imgSize = 40;
+    let left, top;
+
+    if (this.props.orientationForPlayer == playerId.BLACK) {
+      left = (7 - this.props.position.x) * (this.props.squareSize + 2) + (this.props.squareSize - this.props.imgSize)
+      top = this.props.position.y * (this.props.squareSize + 2) + (this.props.squareSize - this.props.imgSize);
+    } else {
+      left = this.props.position.x * (this.props.squareSize + 2) + (this.props.squareSize - this.props.imgSize);
+      top = (7 - this.props.position.y) * (this.props.squareSize + 2) + (this.props.squareSize - this.props.imgSize);
+    }
 
     let style: any = {
+      zIndex: 5,
       width: this.props.size + 'px',
       cursor: 'pointer',
       display: 'block',
       margin: '0 auto',
       position: 'absolute',
-      top: this.props.position.y * (squareSize) + (squareSize -2  - imgSize) + 'px',
-      left: this.props.position.x * (squareSize) + (squareSize -2  - imgSize) + 'px',
+      top: top + 'px',
+      left: left + 'px',
     }
 
     if (this.state.isSelected) {
