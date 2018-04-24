@@ -30,9 +30,7 @@ export interface TableProps {
   onSquareClickEvent: (position: Point) => void;
 }
 
-interface TableState {
-
-}
+interface TableState {}
 
 export default class Table extends React.Component<TableProps, TableState> {
 
@@ -67,25 +65,6 @@ export default class Table extends React.Component<TableProps, TableState> {
       for (let j = 0; j < 8; j++) {
         rowSquares.push(
           <Square coordinate={{x: j, y: i}} size={this.props.squareSize} isHighlighted={this.props.highlightedSquares[i][j]}
-          color={this.getSquareColor(i, j)} highlightedColor={this.props.highlightColor}
-          onClick={this.handleSquareClick} key={(i+1) * (j+64)}/>
-        );
-      }
-      chessBoardElement.push(
-        <tr key={i}>{rowSquares}</tr>
-      );
-    }
-    return chessBoardElement;
-  }
-
-  getRowsAndColumns2() {
-    let chessBoardElement: any = [];
-    for (let i = 0; i < 8; i++) {
-      let rowSquares: any[] = [];
-
-      for (let j = 7; j >= 0; j--) {
-        rowSquares.push(
-          <Square coordinate={{x: i, y: j}} size={this.props.squareSize} isHighlighted={this.props.highlightedSquares[i][j]}
           color={this.getSquareColor(i, j)} highlightedColor={this.props.highlightColor}
           onClick={this.handleSquareClick} key={(i+1) * (j+64)}/>
         );
